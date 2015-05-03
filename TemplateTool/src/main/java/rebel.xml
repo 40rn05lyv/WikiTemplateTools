@@ -2,18 +2,18 @@
 <application xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.zeroturnaround.com" xsi:schemaLocation="http://www.zeroturnaround.com http://www.zeroturnaround.com/alderaan/rebel-2_0.xsd">
 
 	<classpath>
-		<dir name="D:/Development/wikipedia/workspace/TemplateTool/target/classes">
+		<dir name="D:/Development/git/TemplateToolRepo/TemplateTool/target/classes">
 		</dir>
 	</classpath>
 
 	<web>
 		<link target="/">
-			<dir name="D:/Development/wikipedia/workspace/TemplateTool/target/m2e-wtp/web-resources">
+			<dir name="D:/Development/git/TemplateToolRepo/TemplateTool/target/m2e-wtp/web-resources">
 				<exclude name="/"/>
 			</dir>
 		</link>
 		<link target="/">
-			<dir name="D:/Development/wikipedia/workspace/TemplateTool/WebContent">
+			<dir name="D:/Development/git/TemplateToolRepo/TemplateTool/WebContent">
 			</dir>
 		</link>
 	</web>
