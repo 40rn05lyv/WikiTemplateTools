@@ -1,4 +1,4 @@
-package example.find.template.interwiki;
+package org.wikipedia.templates.find.interwiki.list;
 
 import java.io.IOException;
 import java.util.List;
@@ -8,8 +8,8 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import example.api.ConnectionFactory;
-import example.api.QueryHelper;
+import org.wikipedia.api.db.ConnectionFactory;
+import org.wikipedia.api.db.QueryHelper;
 
 public class ListTemplatesWithoutInterwiki extends HttpServlet {
 

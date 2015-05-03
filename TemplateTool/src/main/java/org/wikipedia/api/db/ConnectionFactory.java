@@ -1,4 +1,4 @@
-package example.api;
+package org.wikipedia.api.db;
 
 import java.sql.Connection;
 import java.sql.DriverManager;

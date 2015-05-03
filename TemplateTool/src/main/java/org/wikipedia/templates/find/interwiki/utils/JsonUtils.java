@@ -1,4 +1,4 @@
-package example.find.template.interwiki.utils;
+package org.wikipedia.templates.find.interwiki.utils;
 
 import net.minidev.json.parser.JSONParser;
 import net.minidev.json.parser.ParseException;

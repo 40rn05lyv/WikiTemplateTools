@@ -1,11 +1,11 @@
-package example.api;
+package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.Set;
 
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
+
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-
-import example.api.TemplateInterwikiStorage.UnifiedTemplate;
 
 public class TemplateInterwikiCandidate {
 

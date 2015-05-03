@@ -1,4 +1,4 @@
-package example.api;
+package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.ArrayList;
 import java.util.HashMap;

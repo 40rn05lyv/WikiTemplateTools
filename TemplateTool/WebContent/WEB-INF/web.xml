@@ -19,7 +19,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>FindTemplateInterwiki</servlet-name>
-    <servlet-class>example.find.template.interwiki.FindTemplateInterwikiServlet</servlet-class>
+    <servlet-class>org.wikipedia.templates.find.interwiki.http.FindTemplateInterwikiServlet</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>FindTemplateInterwiki</servlet-name>
@@ -27,7 +27,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>FindTemplateInterwikiDB</servlet-name>
-    <servlet-class>example.find.template.interwiki.FindTemplateInterwikiServletDB</servlet-class>
+    <servlet-class>org.wikipedia.templates.find.interwiki.db.FindTemplateInterwikiServletDB</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>FindTemplateInterwikiDB</servlet-name>
@@ -35,7 +35,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>
-    <servlet-class>example.find.template.interwiki.ListTemplatesWithoutInterwiki</servlet-class>
+    <servlet-class>org.wikipedia.templates.find.interwiki.list.ListTemplatesWithoutInterwiki</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>

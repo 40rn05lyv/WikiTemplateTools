@@ -1,4 +1,4 @@
-package example.find.template.interwiki;
+package org.wikipedia.templates.find.interwiki.http;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -20,12 +20,12 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.wikipedia.api.http.ApiHelper;
+import org.wikipedia.templates.find.interwiki.FindTemplateInterwikiBean;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multisets;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
-import example.api.ApiHelper;
 
 public class FindTemplateInterwikiServlet extends HttpServlet {
 

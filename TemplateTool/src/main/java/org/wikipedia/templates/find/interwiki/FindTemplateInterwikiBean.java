@@ -1,4 +1,4 @@
-package example.find.template.interwiki;
+package org.wikipedia.templates.find.interwiki;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -12,13 +12,12 @@ import java.util.Set;
 
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiCandidate;
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage;
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-
-import example.api.TemplateInterwikiCandidate;
-import example.api.TemplateInterwikiStorage;
-import example.api.TemplateInterwikiStorage.UnifiedTemplate;
 
 public class FindTemplateInterwikiBean {
 

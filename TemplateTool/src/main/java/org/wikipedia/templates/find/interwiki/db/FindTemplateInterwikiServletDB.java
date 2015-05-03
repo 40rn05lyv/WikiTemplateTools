@@ -1,4 +1,4 @@
-package example.find.template.interwiki;
+package org.wikipedia.templates.find.interwiki.db;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
@@ -15,15 +15,12 @@ import net.minidev.json.parser.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.wikipedia.api.db.ConnectionFactory;
+import org.wikipedia.api.db.QueryHelper;
+import org.wikipedia.templates.find.interwiki.FindTemplateInterwikiBean;
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
 
-import com.google.common.collect.ImmutableMultiset;
-import com.google.common.collect.Multisets;
 import com.mashape.unirest.http.exceptions.UnirestException;
-
-import example.api.ConnectionFactory;
-import example.api.QueryHelper;
-import example.api.TemplateInterwikiCandidate;
-import example.api.TemplateInterwikiStorage.UnifiedTemplate;
 
 public class FindTemplateInterwikiServletDB extends HttpServlet {
 
@@ -86,7 +83,6 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
                         }
                         fillTemplatesInForeignArticlesWithoutLang(bean, foreignLang);
                     }
-                    printTemplateCandidates(bean);
                 }
             }
         } catch (UnirestException | ParseException e) {
@@ -132,25 +128,10 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
             for (String template : templates) {
                 UnifiedTemplate unifiedTemplate = bean.getInterwikiStorage().findUnifiedTemplate(foreignLang, template);
                 if (!unifiedTemplate.has(excludeLang)) {
-                    //System.out.println("Found unified template for " + foreignLang + " " + template);
                     bean.addForeignLangAndForeignTemplateCandidate(foreignLang, unifiedTemplate);
                 }
             }
         }
-    }
-
-    private static void printTemplateCandidates(FindTemplateInterwikiBean bean) {
-        for (TemplateInterwikiCandidate template: bean.getCandidates()) {
-            System.out.println(template.toString());
-/*            System.out.print("Langs: " + StringUtils.join(template.getLangs().elementSet(), ", ") + " | ");
-            for (String lang: template.getLangs().elementSet()) {
-                System.out.print(template.get(lang) + " | ");
-            }
-            System.out.println();*/
-            
-        }
-        System.out.println("Number of candidates: " + bean.getCandidates().size());
-        System.out.println("Number of ordered candidates: " + bean.getCandidatesOrdered().size());
     }
 
 }

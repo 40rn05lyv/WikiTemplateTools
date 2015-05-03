@@ -1,4 +1,4 @@
-package example.api;
+package org.wikipedia.api.db;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Connection;
@@ -12,6 +12,7 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage;
 
 public class QueryHelper {
 

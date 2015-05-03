@@ -1,4 +1,4 @@
-package example.api;
+package org.wikipedia.api.http;
 
 import java.util.Set;
 
@@ -6,14 +6,13 @@ import net.minidev.json.parser.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
+import org.wikipedia.templates.find.interwiki.utils.JsonUtils;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
-
-import example.find.template.interwiki.utils.JsonUtils;
 
 public class ApiHelper {
     

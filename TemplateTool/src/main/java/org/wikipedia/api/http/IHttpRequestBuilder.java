@@ -1,8 +1,8 @@
-package example.api;
+package org.wikipedia.api.http;
 
 import com.mashape.unirest.request.HttpRequest;
 
-public interface IHttpRequestBuilder {
+interface IHttpRequestBuilder {
     
     public HttpRequest build(); 
 
