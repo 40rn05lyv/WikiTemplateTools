@@ -20,21 +20,24 @@ public class QueryHelper {
 
     // @formatter:off
     static String linksHereWithoutInterwikiQuery = 
-            "SELECT page.page_id, page.page_title "
+            "SELECT page.page_title "
             + "FROM ( "
             + "SELECT page.page_id, page.page_title "
             + "FROM templatelinks INNER JOIN page ON templatelinks.tl_from=page.page_id "
             + "WHERE templatelinks.tl_namespace=10 AND templatelinks.tl_title=? AND page.page_namespace=10 "
             + ") page LEFT JOIN langlinks ON page.page_id=langlinks.ll_from "
-            + "WHERE langlinks.ll_from IS NULL;";
+            + "WHERE langlinks.ll_from IS NULL "
+            + "LIMIT ? OFFSET ?;";
     // @formatter:on
 
-    public static List<String> getLinksHereTemplatesWithLangLinks(String lang, String templateTitle) throws UnsupportedEncodingException {
+    public static List<String> getLinksHereTemplatesWithoutInterwiki(String lang, String templateTitle, int offset, int limit) {
         templateTitle = DbUtils.toDBView(templateTitle);
         List<String> list = new ArrayList<String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(linksHereWithoutInterwikiQuery);
             st.setString(1, templateTitle);
+            st.setInt(2, limit);
+            st.setInt(3, offset);
             System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
@@ -44,8 +47,47 @@ public class QueryHelper {
             }
         } catch (SQLException s) {
             System.err.println(s);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
         }
         return list;
+    }
+    
+    public static List<String> getLinksHereTemplatesWithoutInterwiki(String lang, String parentTemplate) {
+        return getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate, 0, Integer.MAX_VALUE);
+    }
+    
+    // @formatter:off
+    static String getAllTemplatesWithoutInterwikiQuery = 
+            "SELECT page_title "
+            + "FROM page LEFT JOIN langlinks ON page_id=ll_from "
+            + "WHERE page_namespace=10 AND ll_from IS NULL "
+            + "LIMIT ? OFFSET ?;";
+    // @formatter:on
+
+    public static List<String> getAllTemplatesWithoutInterwiki(String lang, int offset, int limit) {
+        List<String> list = new ArrayList<String>();
+        try {
+            PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(getAllTemplatesWithoutInterwikiQuery);
+            st.setInt(1, limit);
+            st.setInt(2, offset);
+            System.out.println("Querying " + lang + ": " + st.toString());
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String title = new String(set.getBytes("page.page_title"), "UTF-8");
+                list.add(title);
+                System.out.println(title);
+            }
+        } catch (SQLException s) {
+            System.err.println(s);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return list;
+    }
+    
+    public static List<String> getAllTemplatesWithoutInterwiki(String lang) {
+        return getAllTemplatesWithoutInterwiki(lang, 0, Integer.MAX_VALUE);
     }
 
     // @formatter:off
@@ -213,6 +255,5 @@ public class QueryHelper {
         }
         return result;
     }
-
 
 }

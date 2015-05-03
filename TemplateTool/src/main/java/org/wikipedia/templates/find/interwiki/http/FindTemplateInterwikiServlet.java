@@ -90,7 +90,7 @@ public class FindTemplateInterwikiServlet extends HttpServlet {
         req.setAttribute("templateLang", pageLang);
         long end = System.currentTimeMillis();
         System.out.println("FindTemplateInterwikiServlet processed request in " + (end-start) + "ms.");
-        req.getRequestDispatcher("/findinterwiki.jsp").forward(req, resp);
+        req.getRequestDispatcher("/findinterwikihttp.jsp").forward(req, resp);
     }
 
     public static boolean fillTranscludedInArticlesAndLangLinks(FindTemplateInterwikiBean bean) throws UnirestException, ParseException,

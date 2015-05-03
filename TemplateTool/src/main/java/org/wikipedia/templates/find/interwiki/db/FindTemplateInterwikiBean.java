@@ -16,7 +16,7 @@ public class FindTemplateInterwikiBean {
     private TemplateInterwikiStorage interwikiStorage = new TemplateInterwikiStorage();
     private Map<String, Set<String>> foreignLangToForeignArticlesMap = new HashMap<String, Set<String>>();
     private Map<UnifiedTemplate, TemplateInterwikiCandidate> candidatesMap = new HashMap<UnifiedTemplate, TemplateInterwikiCandidate>();
-
+    
     public FindTemplateInterwikiBean(String pageLang, String templateTitle) {
         this.pageLang = pageLang;
         if (templateTitle.startsWith("Template:")) {

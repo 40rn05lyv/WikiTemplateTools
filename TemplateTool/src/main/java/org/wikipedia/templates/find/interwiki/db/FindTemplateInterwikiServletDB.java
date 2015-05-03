@@ -15,6 +15,7 @@ import net.minidev.json.parser.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.wikipedia.api.Constants;
 import org.wikipedia.api.db.ConnectionFactory;
 import org.wikipedia.api.db.QueryHelper;
 
