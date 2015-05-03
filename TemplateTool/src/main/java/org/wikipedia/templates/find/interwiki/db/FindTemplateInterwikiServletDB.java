@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.wikipedia.api.db.ConnectionFactory;
 import org.wikipedia.api.db.QueryHelper;
-import org.wikipedia.templates.find.interwiki.FindTemplateInterwikiBean;
 import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
@@ -55,9 +54,9 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
         }
         boolean limitLangs = langsToSearch != null && langsToSearch.size() > 0;
 
-        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean();
-        bean.setPageLang(pageLang);
-        bean.setTemplateTitle(pageTitle);
+        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean(pageLang, pageTitle);
+
+        // TODO: search, maybe this template already has interwiki!
 
         boolean hasTransclusions = false;
         try {
@@ -108,7 +107,7 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
     public static boolean fillTranscludedInArticlesAndLangLinks(FindTemplateInterwikiBean bean) throws UnirestException, ParseException,
             UnsupportedEncodingException {
         List<Pair<String, String>> transcludedInLangLinks = QueryHelper.findTranscludedInArticlesAndLangLinksFull(bean.getPageLang(),
-                bean.getSimpleTitle());
+                bean.getTitle());
         if (transcludedInLangLinks.isEmpty()) {
             return false;
         }

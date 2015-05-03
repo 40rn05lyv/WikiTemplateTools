@@ -21,7 +21,6 @@ import org.apache.commons.lang3.tuple.Triple;
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.wikipedia.api.http.ApiHelper;
-import org.wikipedia.templates.find.interwiki.FindTemplateInterwikiBean;
 
 import com.google.common.collect.ImmutableMultiset;
 import com.google.common.collect.Multisets;
@@ -38,12 +37,6 @@ public class FindTemplateInterwikiServlet extends HttpServlet {
         String pageLang = req.getParameter("pageLang");
         String langsToSearchParam = req.getParameter("searchLangs");
 
-        /*
-         * String pageTitle = "ASUS_Eee_Family"; pageTitle = "Template:" +
-         * pageTitle; String pageLang = "uk"; String langsToSearchParam =
-         * "en|de|fr|ru|pl|be|be-x-old";
-         */
-
         // TODO: search, maybe this template already has interwiki!
 
         List<String> langsToSearch = null;
@@ -52,9 +45,7 @@ public class FindTemplateInterwikiServlet extends HttpServlet {
         }
         boolean limitLangs = langsToSearch != null && langsToSearch.size() > 0;
 
-        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean();
-        bean.setPageLang(pageLang);
-        bean.setTemplateTitle(pageTitle);
+        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean(pageLang, pageTitle);
 
         boolean hasTransclusions = false;
         try {
