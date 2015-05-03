@@ -47,7 +47,11 @@
 									</a>
 									<c:if test="${not subStatus.last}">, </c:if>
 								</c:forEach></td>
-							<td>${candidate.size()} (<c:forEach items="${candidate.langs.elementSet()}" var="lang" varStatus="subStatus">${candidate.langs.count(lang)}<c:if test="${not subStatus.last}">, </c:if></c:forEach>)</td>
+							<td>${candidate.size()}
+							<c:if test="${candidate.langs.elementSet().size() > 1}"> 
+							(<c:forEach items="${candidate.langs.elementSet()}" var="lang" varStatus="subStatus">${candidate.langs.count(lang)}<c:if test="${not subStatus.last}">, </c:if></c:forEach>)
+							</c:if>
+							</td>
 						</tr>
 					</c:forEach>
 				</tbody>
