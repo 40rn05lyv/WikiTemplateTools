@@ -17,7 +17,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.wikipedia.api.db.ConnectionFactory;
 import org.wikipedia.api.db.QueryHelper;
-import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
 

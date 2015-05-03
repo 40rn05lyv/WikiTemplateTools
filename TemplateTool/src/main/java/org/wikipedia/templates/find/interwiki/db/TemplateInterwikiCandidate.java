@@ -2,8 +2,6 @@ package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.Set;
 
-import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
-
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
@@ -36,7 +34,16 @@ public class TemplateInterwikiCandidate {
         }
         return (String) set.toArray()[0];
     }
-    
+
+    public String getForDisplay(String lang) {
+        String template = get(lang);
+        if (template.indexOf(':') != -1) {
+            template = template.substring(template.indexOf(':') + 1);
+        }
+        template = template.replaceAll("_", " ");
+        return template;
+    }
+
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();

@@ -9,8 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage.UnifiedTemplate;
-
 public class FindTemplateInterwikiBean {
 
     private String pageLang;

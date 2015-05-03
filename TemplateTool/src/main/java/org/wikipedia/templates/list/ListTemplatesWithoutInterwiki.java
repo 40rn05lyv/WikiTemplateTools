@@ -30,7 +30,7 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
         String lang = req.getParameter("lang");
         String parentTemplate = req.getParameter("parentTemplate");
         List<String> templates = QueryHelper.getLinksHereTemplatesWithLangLinks(lang, parentTemplate);
-        req.setAttribute("searchLang", "uk");
+        req.setAttribute("searchLang", lang);
         req.setAttribute("templates", templates);
         req.getRequestDispatcher("/listwithoutinterwiki.jsp").forward(req, resp);
     }

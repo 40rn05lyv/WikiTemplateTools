@@ -30,11 +30,12 @@ public class QueryHelper {
     // @formatter:on
 
     public static List<String> getLinksHereTemplatesWithLangLinks(String lang, String templateTitle) throws UnsupportedEncodingException {
+        templateTitle = DbUtils.toDBView(templateTitle);
         List<String> list = new ArrayList<String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(linksHereWithoutInterwikiQuery);
-            int i = 1;
-            st.setString(i++, templateTitle);
+            st.setString(1, templateTitle);
+            System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
                 String title = new String(set.getBytes("page.page_title"), "UTF-8");

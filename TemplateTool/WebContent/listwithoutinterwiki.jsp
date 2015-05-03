@@ -38,7 +38,5 @@
 			</c:forEach>
 		</tbody>
 	</table>
-
-	<a href="/WikiNavbar/MyServlet/?continue=${continueParam}" class="btn btn-primary btn-lg active pull-right" role="button">Continue</a>
 </body>
 </html>

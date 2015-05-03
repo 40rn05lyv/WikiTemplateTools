@@ -43,7 +43,7 @@
 								</c:forEach></td>
 							<td><c:forEach items="${candidate.langs.elementSet()}" var="lang" varStatus="subStatus">
 									<a href="http://${lang}.wikipedia.org/wiki/<c:out value="${candidate.get(lang)}"/>" />
-									<c:out value="${candidate.get(lang)}" />
+									<c:out value="${candidate.getForDisplay(lang)}" />
 									</a>
 									<c:if test="${not subStatus.last}">, </c:if>
 								</c:forEach></td>

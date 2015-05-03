@@ -1,11 +1,14 @@
 package org.wikipedia.api.http;
 
+import java.io.UnsupportedEncodingException;
 import java.util.Set;
 
 import net.minidev.json.parser.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONException;
 import org.json.JSONObject;
+import org.wikipedia.api.Constants;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
@@ -15,10 +18,6 @@ import com.mashape.unirest.request.HttpRequest;
 
 public class ApiHelper {
     
-    private static final int NAMESPACE_ARTICLE = 0;
-    private static final int NAMESPACE_TEMPLATE = 10; 
-    private static final String MAX_LIMIT = "max";
-
     private static final String DEFAULT_WIKI = "en";
     static String defaultApiUrl = api(DEFAULT_WIKI);
     
@@ -35,7 +34,7 @@ public class ApiHelper {
         }
         for (Object page: pages.keySet()) {
             JSONObject pageObj = pages.getJSONObject((String) page);
-            if (pageObj.getInt("ns") == NAMESPACE_TEMPLATE) {
+            if (pageObj.getInt("ns") == Constants.NAMESPACE_TEMPLATE) {
                 return true;
             }
         }
@@ -52,11 +51,11 @@ public class ApiHelper {
                         .queryString("action", "query")
                         .queryString("titles", pageTitle)
                         .queryString("generator", "transcludedin")
-                        .queryString("gtilimit", MAX_LIMIT)
-                        .queryString("gtinamespace", NAMESPACE_ARTICLE)
+                        .queryString("gtilimit", Constants.MAX_LIMIT)
+                        .queryString("gtinamespace", Constants.NAMESPACE_ARTICLE)
                         .queryString("gtishow", "!redirect")
                         .queryString("prop", "langlinks")
-                        .queryString("lllimit", MAX_LIMIT);
+                        .queryString("lllimit", Constants.MAX_LIMIT);
                 // @formatter:on
             }
         });
@@ -72,8 +71,8 @@ public class ApiHelper {
                         .queryString("action", "query")
                         .queryString("titles", pageTitle)
                         .queryString("prop", "transcludedin")
-                        .queryString("tilimit", MAX_LIMIT)
-                        .queryString("tinamespace", NAMESPACE_ARTICLE)
+                        .queryString("tilimit", Constants.MAX_LIMIT)
+                        .queryString("tinamespace", Constants.NAMESPACE_ARTICLE)
                         .queryString("tishow", "!redirect");
                 // @formatter:on
             }
@@ -113,11 +112,11 @@ public class ApiHelper {
                         .queryString("action", "query")
                         .queryString("titles", article)
                         .queryString("generator", "templates")
-                        .queryString("gtllimit", MAX_LIMIT)
-                        .queryString("gtlnamespace", NAMESPACE_TEMPLATE)
+                        .queryString("gtllimit", Constants.MAX_LIMIT)
+                        .queryString("gtlnamespace", Constants.NAMESPACE_TEMPLATE)
                         .queryString("prop", "langlinks")
                         .queryString("lllang", targetLang)
-                        .queryString("lllimit", MAX_LIMIT);
+                        .queryString("lllimit", Constants.MAX_LIMIT);
                 // @formatter:on
             }
         });
@@ -144,14 +143,43 @@ public class ApiHelper {
                         .queryString("action", "query")
                         .queryString("titles", titles)
                         .queryString("generator", "templates")
-                        .queryString("gtllimit", MAX_LIMIT)
-                        .queryString("gtlnamespace", NAMESPACE_TEMPLATE)
+                        .queryString("gtllimit", Constants.MAX_LIMIT)
+                        .queryString("gtlnamespace", Constants.NAMESPACE_TEMPLATE)
                         .queryString("prop", "langlinks")
                         .queryString("lllang", targetLang)
-                        .queryString("lllimit", MAX_LIMIT);
+                        .queryString("lllimit", Constants.MAX_LIMIT);
                 // @formatter:on
             }
         });
     }
+
+    public static String findNamespaceName(String lang, int namespaceTemplate) {
+        // @formatter:off
+        HttpRequest request = Unirest.get(api(lang))
+                .queryString("format", "json")
+                .queryString("action", "query")
+                .queryString("meta", "siteinfo")
+                .queryString("siprop", "namespaces");
+        // @formatter:on
+        String namespaceName = null;
+        try {
+            JSONObject json = request.asJson().getBody().getObject();
+            JSONObject namespacesObj = json.getJSONObject("query").getJSONObject("namespaces");
+            String namespaceTemplateStr = String.valueOf(namespaceTemplate);
+            if (namespacesObj.has(namespaceTemplateStr)) {
+                JSONObject namespaceObj = namespacesObj.getJSONObject(namespaceTemplateStr);
+                namespaceName = new String(namespaceObj.getString("*").getBytes("UTF-8"), "UTF-8");
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return namespaceName;
+    }
+    
+    
 
 }

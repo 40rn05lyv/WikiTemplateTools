@@ -2,42 +2,13 @@ package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
+
+import org.wikipedia.api.Constants;
+import org.wikipedia.api.http.ApiHelper;
 
 public class TemplateInterwikiStorage {
-
-    public class UnifiedTemplate {
-        private Map<String, Set<String>> langToTitlesMap = new HashMap<String, Set<String>>();
-
-        void putInterwiki(String lang, String title) {
-            if (lang == null || title == null) {
-                return;
-            }
-            Set<String> titles = langToTitlesMap.get(lang);
-            if (titles == null) {
-                titles = new HashSet<String>();
-                langToTitlesMap.put(lang, titles);
-            }
-            titles.add(title);
-            //System.out.println("INFO: Added interwiki (" + lang + ", " + title + ").");
-        }
-
-        public boolean has(String lang) {
-            return langToTitlesMap.containsKey(lang);
-        }
-
-        public Set<String> get(String lang) {
-            return langToTitlesMap.get(lang);
-        }
-        
-        @Override
-        public String toString() {
-            return langToTitlesMap.toString();
-        }
-    }
 
     private List<UnifiedTemplate> templates = new ArrayList<UnifiedTemplate>();
 
@@ -58,6 +29,7 @@ public class TemplateInterwikiStorage {
         if (lang == null || title == null) {
             return null;
         }
+        title = UnifiedTemplate.unify(lang, title);
         for (UnifiedTemplate template : templates) {
             if (template.has(lang) && template.get(lang).contains(title)) {
                 return template;
@@ -68,6 +40,18 @@ public class TemplateInterwikiStorage {
 
     public List<UnifiedTemplate> getTemplates() {
         return templates;
+    }
+
+    private static Map<String, String> templateNamespaceMap = new HashMap<String, String>();
+
+    public static String getTemplateNamespaceName(String lang) {
+        String namespaceName = templateNamespaceMap.get(lang);
+        if (namespaceName != null) {
+            return namespaceName;
+        }
+        namespaceName = ApiHelper.findNamespaceName(lang, Constants.NAMESPACE_TEMPLATE);
+        templateNamespaceMap.put(lang, namespaceName);
+        return namespaceName;
     }
 
 }
