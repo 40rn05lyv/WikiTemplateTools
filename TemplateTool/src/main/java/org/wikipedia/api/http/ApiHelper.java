@@ -6,7 +6,6 @@ import net.minidev.json.parser.ParseException;
 
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONObject;
-import org.wikipedia.templates.find.interwiki.utils.JsonUtils;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
