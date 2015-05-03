@@ -19,7 +19,7 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
 
     private static final long serialVersionUID = -8441332046266659846L;
     private static final int DEFAULT_LIMIT = Integer.MAX_VALUE;
-    
+
     @Override
     public void init() throws ServletException {
         super.init();
@@ -29,7 +29,7 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
             e.printStackTrace();
         }
     }
-    
+
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         String langParam = req.getParameter("lang");
@@ -38,7 +38,7 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
         String limitParam = req.getParameter("limit");
         String allParam = req.getParameter("all");
         String includeSubtemplatesParam = req.getParameter("includeSubtemplates");
-        
+
         String lang = langParam;
         String parentTemplate = parentTemplateParam;
         Integer from = 0;
@@ -59,31 +59,36 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
                 includeSubtemplates = true;
             }
         }
-        
+
         List<String> templates = null;
-        if (all) {
-            if (!StringUtils.isNullOrEmpty(parentTemplate)) {
-                templates = QueryHelper.getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate);
+        if (!StringUtils.isNullOrEmpty(lang)) {
+            if (all) {
+                if (!StringUtils.isNullOrEmpty(parentTemplate)) {
+                    templates = QueryHelper.getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate);
+                } else {
+                    templates = QueryHelper.getAllTemplatesWithoutInterwiki(lang);
+                }
             } else {
-                templates = QueryHelper.getAllTemplatesWithoutInterwiki(lang);
-            }
-        } else {
-            if (!StringUtils.isNullOrEmpty(parentTemplate)) {
-                templates = QueryHelper.getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate, from, limit);
-            } else {
-                templates = QueryHelper.getAllTemplatesWithoutInterwiki(lang, from, limit);
-            }
-        }
-        
-        if (!includeSubtemplates) {
-            Iterator<String> it = templates.iterator();
-            while (it.hasNext()) {
-                if (it.next().contains("/")) {
-                    it.remove();
+                if (!StringUtils.isNullOrEmpty(parentTemplate)) {
+                    templates = QueryHelper.getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate, from, limit);
+                } else {
+                    templates = QueryHelper.getAllTemplatesWithoutInterwiki(lang, from, limit);
                 }
             }
+            
+            if (!includeSubtemplates && templates != null) {
+                Iterator<String> it = templates.iterator();
+                while (it.hasNext()) {
+                    if (it.next().contains("/")) {
+                        it.remove();
+                    }
+                }
+            }
+        } else {
+            req.setAttribute("hideTable", true);
         }
-        
+
+
         req.setAttribute("supportedLangs", Constants.SUPPORTED_LANGS);
         req.setAttribute("searchLang", langParam);
         req.setAttribute("searchTemplate", parentTemplateParam);
@@ -91,7 +96,7 @@ public class ListTemplatesWithoutInterwiki extends HttpServlet {
         req.setAttribute("templates", templates);
         req.getRequestDispatcher("/listwithoutinterwiki.jsp").forward(req, resp);
     }
-    
+
     @Override
     public void destroy() {
         super.destroy();

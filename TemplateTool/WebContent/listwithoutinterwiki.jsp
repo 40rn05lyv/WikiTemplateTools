@@ -61,28 +61,29 @@
 			</div>
 		</form>
 
-		<table class="table table-condensed table-hover">
-		<thead>
-			<tr>
-				<th>#</th>
-				<th>Template without interwiki</th>
-				<th></th>
-			</tr>
-		</thead>
-		<tbody>
-			<c:forEach items="${templates}" var="item" varStatus="status">
-				<tr>
-					<td><c:out value="${status.index + 1}" /></td>
-					<td><a href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
-					<td><a
-						href="/WikiNavbar/FindTemplateInterwikiDB/?pageTitle=Template:<c:out value="${item}"/>&pageLang=${searchLang}&searchLangs=en|ru|pl|be|be-x-old">
-							Find Interwiki </a></td>
-				</tr>
-			</c:forEach>
-		</tbody>
-	</table>
-
-<!-- 		<nav>
+		<c:if test="${not hideTable}">
+			<table class="table table-condensed table-hover">
+				<thead>
+					<tr>
+						<th>#</th>
+						<th>Template without interwiki</th>
+						<th></th>
+					</tr>
+				</thead>
+				<tbody>
+					<c:forEach items="${templates}" var="item" varStatus="status">
+						<tr>
+							<td><c:out value="${status.index + 1}" /></td>
+							<td><a href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
+							<td><a
+								href="/WikiNavbar/FindTemplateInterwikiDB/?pageTitle=Template:<c:out value="${item}"/>&pageLang=${searchLang}&searchLangs=en|ru|pl|be|be-x-old">
+									Find Interwiki </a></td>
+						</tr>
+					</c:forEach>
+				</tbody>
+			</table>
+		</c:if>
+		<!-- 		<nav>
 			<ul class="pagination pagination-lg">
 				<li><a href="#" aria-label="Previous"> <span aria-hidden="true">&laquo;</span>
 				</a></li>
