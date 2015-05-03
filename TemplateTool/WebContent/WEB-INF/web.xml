@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd" id="WebApp_ID" version="3.1">
+  <display-name>WikiNavbar</display-name>
+  <servlet>
+    <servlet-name>MyServlet</servlet-name>
+    <servlet-class>example.my.servlet.MyServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MyServlet</servlet-name>
+    <url-pattern>/MyServlet/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>MyServlet2</servlet-name>
+    <servlet-class>example.my.servlet.MyServlet2</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>MyServlet2</servlet-name>
+    <url-pattern>/MyServlet2/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>FindTemplateInterwiki</servlet-name>
+    <servlet-class>example.find.template.interwiki.FindTemplateInterwikiServlet</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FindTemplateInterwiki</servlet-name>
+    <url-pattern>/FindTemplateInterwiki/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>FindTemplateInterwikiDB</servlet-name>
+    <servlet-class>example.find.template.interwiki.FindTemplateInterwikiServletDB</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>FindTemplateInterwikiDB</servlet-name>
+    <url-pattern>/FindTemplateInterwikiDB/*</url-pattern>
+  </servlet-mapping>
+  <servlet>
+    <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>
+    <servlet-class>example.find.template.interwiki.ListTemplatesWithoutInterwiki</servlet-class>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>
+    <url-pattern>/ListTemplatesWithoutInterwiki/*</url-pattern>
+  </servlet-mapping>
+</web-app>
