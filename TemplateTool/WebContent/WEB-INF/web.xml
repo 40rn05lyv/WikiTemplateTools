@@ -35,7 +35,7 @@
   </servlet-mapping>
   <servlet>
     <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>
-    <servlet-class>org.wikipedia.templates.find.interwiki.list.ListTemplatesWithoutInterwiki</servlet-class>
+    <servlet-class>org.wikipedia.templates.list.ListTemplatesWithoutInterwiki</servlet-class>
   </servlet>
   <servlet-mapping>
     <servlet-name>ListTemplatesWithoutInterwiki</servlet-name>

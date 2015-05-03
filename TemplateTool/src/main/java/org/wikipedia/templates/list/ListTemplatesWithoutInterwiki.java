@@ -1,4 +1,4 @@
-package org.wikipedia.templates.find.interwiki.list;
+package org.wikipedia.templates.list;
 
 import java.io.IOException;
 import java.util.List;
