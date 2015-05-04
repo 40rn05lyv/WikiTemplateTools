@@ -37,7 +37,7 @@ public class ConnectionFactory {
             System.out.println("localhost:" + assinged_port + " -> " + rhost + ":" + rport);
             String url = "jdbc:mysql://127.0.0.1:" + lport + "/";
             String db = lang + "wiki_p";
-            con = DriverManager.getConnection(url + db + "?useUnicode=true&characterEncoding=UTF-8", dbUser, dbPasswd);
+            con = DriverManager.getConnection(url + db + "?useUnicode=true&characterEncoding=UTF-8&autoReconnect=true", dbUser, dbPasswd);
             connectionMap.put(lang, con);
         } catch (JSchException e) {
             e.printStackTrace();

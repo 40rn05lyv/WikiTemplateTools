@@ -44,8 +44,8 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         long start = System.currentTimeMillis();
-        String pageTitle = req.getParameter("pageTitle");
-        String pageLang = req.getParameter("pageLang");
+        String pageTitle = req.getParameter("template");
+        String pageLang = req.getParameter("lang");
         String langsToSearchParam = req.getParameter("searchLangs");
 
         List<String> langsToSearch = null;
@@ -56,41 +56,43 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
 
         FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean(pageLang, pageTitle);
 
-        // TODO: search, maybe this template already has interwiki!
-
+        boolean templateExists = QueryHelper.doesTemplateExist(pageLang, pageTitle);
         boolean hasTransclusions = false;
-        try {
-            hasTransclusions = fillTranscludedInArticlesAndLangLinks(bean);
-            if (hasTransclusions) {
-                boolean hasFullMatches = false;
-                if (isEnglishNameOnly(pageTitle)) {
-                    for (String foreignLang : bean.getForeignLangs()) {
-                        if (limitLangs && !langsToSearch.contains(foreignLang)) {
-                            continue;
+        if (!templateExists) {
+            try {
+                hasTransclusions = fillTranscludedInArticlesAndLangLinks(bean);
+                if (hasTransclusions) {
+                    boolean hasFullMatches = false;
+                    if (isEnglishNameOnly(pageTitle)) {
+                        for (String foreignLang : bean.getForeignLangs()) {
+                            if (limitLangs && !langsToSearch.contains(foreignLang)) {
+                                continue;
+                            }
+                            if (QueryHelper.doesTemplateExist(foreignLang, pageTitle)) {
+                                System.out.println("Page with the same name exists in " + foreignLang + " wikipedia.");
+                                hasFullMatches = true;
+                                continue;
+                            }
                         }
-                        if (QueryHelper.doesTemplateExist(foreignLang, pageTitle)) {
-                            System.out.println("Page with the same name exists in " + foreignLang + " wikipedia.");
-                            hasFullMatches = true;
-                            continue;
+                    }
+                    if (!hasFullMatches) {
+                        for (String foreignLang : bean.getForeignLangs()) {
+                            if (limitLangs && !langsToSearch.contains(foreignLang)) {
+                                continue;
+                            }
+                            fillTemplatesInForeignArticlesWithoutLang(bean, foreignLang);
                         }
                     }
                 }
-                if (!hasFullMatches) {
-                    for (String foreignLang : bean.getForeignLangs()) {
-                        if (limitLangs && !langsToSearch.contains(foreignLang)) {
-                            continue;
-                        }
-                        fillTemplatesInForeignArticlesWithoutLang(bean, foreignLang);
-                    }
-                }
+            } catch (UnirestException | ParseException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
             }
-        } catch (UnirestException | ParseException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
         }
         // TODO: show something when hasFullMatches is true
         // TODO: show number of transclusion
+        req.setAttribute("supportedLangs", Constants.SUPPORTED_LANGS);
         req.setAttribute("hasTransclusions", hasTransclusions);
         req.setAttribute("candidates", bean.getCandidatesOrdered());
         req.setAttribute("template", pageTitle);

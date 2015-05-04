@@ -11,8 +11,6 @@
 <!-- Optional theme -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap-theme.min.css">
 
-<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js">
-
 <!-- Latest compiled and minified JavaScript -->
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
@@ -22,13 +20,12 @@
 		<div class="page-header">
 			<h2>
 				Templates without Interwiki
-				<p><small>Tool that helps to find templates without interwiki.</small></p>
+				<p><small>Tool that helps to find templates without interwiki</small></p>
 			</h2>
 		</div>
 
 		<form id="searchForm" class="form-horizontal" method="get" action="/WikiNavbar/ListTemplatesWithoutInterwiki/">
 			<div class="form-group">
-				<!-- List is get from https://meta.wikimedia.org/wiki/List_of_Wikipedias -->
 				<label for="lang" class="col-sm-2 control-label">Language code:</label>
 				<div class="col-sm-1">
 					<select name="lang" class="form-control">
@@ -39,7 +36,6 @@
 				</div>
 			</div>
 			<div class="form-group">
-				<!-- List is get from https://meta.wikimedia.org/wiki/List_of_Wikipedias -->
 				<label for="parentTemplate" class="col-sm-2 control-label">Transclude filter:</label>
 				<div class="col-sm-3">
 					<input type="text" class="form-control" name="parentTemplate" value="${searchTemplate}" placeholder='e.g. "Navbox", "Sidebar" etc.'>
@@ -74,9 +70,9 @@
 					<c:forEach items="${templates}" var="item" varStatus="status">
 						<tr>
 							<td><c:out value="${status.index + 1}" /></td>
-							<td><a href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
-							<td><a
-								href="/WikiNavbar/FindTemplateInterwikiDB/?pageTitle=Template:<c:out value="${item}"/>&pageLang=${searchLang}&searchLangs=en|ru|pl|be|be-x-old">
+							<td><a target="_blank" href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
+							<td><a target="_blank"
+								href="/WikiNavbar/FindTemplateInterwikiDB/?template=Template:<c:out value="${item}"/>&lang=${searchLang}&searchLangs=en|ru|pl|be|be-x-old">
 									Find Interwiki </a></td>
 						</tr>
 					</c:forEach>

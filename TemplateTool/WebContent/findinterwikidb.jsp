@@ -2,7 +2,8 @@
 <%@ page isELIgnored="false"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib prefix="fmt" uri="http://java.sun.com/jsp/jstl/fmt"%>
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
 <!-- Latest compiled and minified CSS -->
 <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
@@ -14,18 +15,58 @@
 <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
 </head>
 <body>
-	<h2>Find Template Interwiki Tool</h2>
-	<br />
-	<h3>
+    <div class="container">
+
+        <div class="page-header">
+            <h2>
+                Find Template Interwiki
+                <p><small>Tool that helps to find interwiki for template</small></p>
+            </h2>
+        </div>
+        
+        <form id="searchForm" class="form-horizontal" method="get" action="/WikiNavbar/FindTemplateInterwikiDB/">
+            <div class="form-group">
+                <label for="lang" class="col-sm-2 control-label">Language code:</label>
+                <div class="col-sm-1">
+                    <select name="lang" class="form-control">
+                    <c:forEach items="${supportedLangs}" var="supportedLang">
+                       <option value="${supportedLang}" <c:if test="${supportedLang eq templateLang}">selected</c:if>>${supportedLang}</option>
+                    </c:forEach>
+                    </select>
+                    <p>wikipedia.org</p>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="parentTemplate" class="col-sm-2 control-label">Transclude filter:</label>
+                <div class="col-sm-3">
+                    <input type="text" class="form-control" name="parentTemplate" value="${searchTemplate}" placeholder='e.g. "Navbox", "Sidebar" etc.'>
+                </div>
+                <div class="col-sm-7">
+                    <p>Transclude filter shows only templates that transclude given template. For example, it can be useful to see only navigation templates (that transclude "Navbox" template).</p> 
+                </div> 
+            </div>
+            <div class="form-group">
+                <div class="col-sm-offset-2 col-sm-3">
+                    <label><input type="checkbox" name="includeSubtemplates" <c:if test="${includeSubtemplates}">checked</c:if>> Include subtemplates</label>
+                </div>
+                <div class="col-sm-6">
+                     <p>Include subtemplates like "Template:Navbox/documentation" etc. <strong>Not recommended.</strong></p>
+                </div>
+            </div>
+            <div class="col-sm-offset-4">
+                 <button type="submit" class="btn btn-primary">Search</button>
+            </div>
+        </form>
+        
+        
 		Template to search: <a href="http://${templateLang}.wikipedia.org/wiki/${template}">${template}</a>
-	</h3>
 
 	<c:choose>
 		<c:when test="${not hasTransclusions}">
 			<h2>This templates does not have transclusions or transclusions don't have interwiki.</h2>
 		</c:when>
 		<c:otherwise>
-			<table class="table">
+            <table class="table table-condensed table-hover">
 				<thead>
 					<tr>
 						<th>#</th>
@@ -58,6 +99,7 @@
 			</table>
 		</c:otherwise>
 	</c:choose>
-
+    
+    </div>
 </body>
 </html>
