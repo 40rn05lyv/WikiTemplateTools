@@ -29,6 +29,7 @@
 				<label for="lang" class="col-sm-2 control-label">Language code:</label>
 				<div class="col-sm-1">
 					<select name="lang" class="form-control">
+					   <option value=""></option>
 					<c:forEach items="${supportedLangs}" var="supportedLang">
 					   <option value="${supportedLang}" <c:if test="${supportedLang eq searchLang}">selected</c:if>>${supportedLang}</option>
 					</c:forEach>
@@ -45,7 +46,7 @@
 				</div> 
 			</div>
 			<div class="form-group">
-				<div class="col-sm-offset-2 col-sm-3">
+				<div class="checkbox col-sm-offset-2 col-sm-3">
 					<label><input type="checkbox" name="includeSubtemplates" <c:if test="${includeSubtemplates}">checked</c:if>> Include subtemplates</label>
 				</div>
 				<div class="col-sm-6">
@@ -72,7 +73,7 @@
 							<td><c:out value="${status.index + 1}" /></td>
 							<td><a target="_blank" href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
 							<td><a target="_blank"
-								href="/WikiNavbar/FindTemplateInterwikiDB/?template=Template:<c:out value="${item}"/>&lang=${searchLang}&searchLangs=en|ru|pl|be|be-x-old">
+								href="/WikiNavbar/FindTemplateInterwikiDB/?templateName=Template:<c:out value="${item}"/>&templateLang=${searchLang}&searchLangs=en,ru,pl,be,be-x-old&freeze=true">
 									Find Interwiki </a></td>
 						</tr>
 					</c:forEach>

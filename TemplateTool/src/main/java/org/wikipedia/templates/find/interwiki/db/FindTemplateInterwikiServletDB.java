@@ -1,9 +1,7 @@
 package org.wikipedia.templates.find.interwiki.db;
 
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.Arrays;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Set;
 
 import javax.servlet.ServletException;
@@ -11,15 +9,10 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import net.minidev.json.parser.ParseException;
-
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.Pair;
-import org.wikipedia.api.Constants;
+import org.wikipedia.api.PageUtils;
 import org.wikipedia.api.db.ConnectionFactory;
-import org.wikipedia.api.db.QueryHelper;
-
-import com.mashape.unirest.http.exceptions.UnirestException;
 
 public class FindTemplateInterwikiServletDB extends HttpServlet {
 
@@ -36,103 +29,64 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
     }
 
     @Override
-    public void destroy() {
-        super.destroy();
-        ConnectionFactory.stop();
-    }
-
-    @Override
     protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        long start = System.currentTimeMillis();
-        String pageTitle = req.getParameter("template");
-        String pageLang = req.getParameter("lang");
-        String langsToSearchParam = req.getParameter("searchLangs");
+        // TODO: add start-end time as separate filter
+        String templateLang = req.getParameter("templateLang");
+        String templateNameParam = req.getParameter("templateName");
+        String searchLangsParam = req.getParameter("searchLangs");
+        String freezeParam = req.getParameter("freeze");
 
-        List<String> langsToSearch = null;
-        if (langsToSearchParam != null) {
-            langsToSearch = Arrays.asList(StringUtils.split(langsToSearchParam, "|"));
-        }
-        boolean limitLangs = langsToSearch != null && langsToSearch.size() > 0;
-
-        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean(pageLang, pageTitle);
-
-        boolean templateExists = QueryHelper.doesTemplateExist(pageLang, pageTitle);
-        boolean hasTransclusions = false;
-        if (!templateExists) {
-            try {
-                hasTransclusions = fillTranscludedInArticlesAndLangLinks(bean);
-                if (hasTransclusions) {
-                    boolean hasFullMatches = false;
-                    if (isEnglishNameOnly(pageTitle)) {
-                        for (String foreignLang : bean.getForeignLangs()) {
-                            if (limitLangs && !langsToSearch.contains(foreignLang)) {
-                                continue;
-                            }
-                            if (QueryHelper.doesTemplateExist(foreignLang, pageTitle)) {
-                                System.out.println("Page with the same name exists in " + foreignLang + " wikipedia.");
-                                hasFullMatches = true;
-                                continue;
-                            }
-                        }
-                    }
-                    if (!hasFullMatches) {
-                        for (String foreignLang : bean.getForeignLangs()) {
-                            if (limitLangs && !langsToSearch.contains(foreignLang)) {
-                                continue;
-                            }
-                            fillTemplatesInForeignArticlesWithoutLang(bean, foreignLang);
-                        }
-                    }
+        // Convertations
+        Set<String> searchLangs = null;
+        if (searchLangsParam != null) {
+            searchLangs = new HashSet<String>();
+            String[] splittedLangs = searchLangsParam.split(",");
+            for (int i = 0; i < splittedLangs.length; i++) {
+                String trimmed = splittedLangs[i].trim();
+                if (!trimmed.isEmpty()) {
+                    searchLangs.add(trimmed);
                 }
-            } catch (UnirestException | ParseException e) {
-                e.printStackTrace();
-            } catch (UnsupportedEncodingException e) {
-                e.printStackTrace();
             }
+            searchLangs.remove(templateLang);
         }
-        // TODO: show something when hasFullMatches is true
-        // TODO: show number of transclusion
-        req.setAttribute("supportedLangs", Constants.SUPPORTED_LANGS);
-        req.setAttribute("hasTransclusions", hasTransclusions);
-        req.setAttribute("candidates", bean.getCandidatesOrdered());
-        req.setAttribute("template", pageTitle);
-        req.setAttribute("templateLang", pageLang);
-        long end = System.currentTimeMillis();
-        System.out.println("FindTemplateInterwikiServletDB processed request in " + (end - start) + "ms.");
+        String templateName = null;
+        if (templateNameParam != null) {
+            templateName = PageUtils.removeNamespace(templateNameParam);
+            templateName = PageUtils.toNormalView(templateName);
+        }
+        boolean freeze = Boolean.valueOf(freezeParam);
+
+        // Validations
+        boolean templateLangValid = !StringUtils.isEmpty(templateLang);
+        boolean templateNameValid = !StringUtils.isEmpty(templateName);
+        boolean searchLangsValid = !CollectionUtils.isEmpty(searchLangs);
+
+        if (!templateLangValid || !templateNameValid || !searchLangsValid) {
+            freeze = true;
+        }
+
+        // Processing
+        FindTemplateInterwikiBean bean = new FindTemplateInterwikiBean();
+        bean.setTemplateLang(templateLang);
+        bean.setTemplateName(templateName);
+        bean.setSearchLangs(searchLangs);
+        bean.setFreeze(freeze);
+
+        if (!freeze) {
+            FindTemplateInterwikiProcessor processor = new FindTemplateInterwikiProcessor(templateLang, templateName, searchLangs);
+            FindTemplateInterwikiResult result = processor.process();
+            bean.setResult(result);
+            // TODO: show number of transclusion
+        }
+        
+        req.setAttribute("bean", bean);
         req.getRequestDispatcher("/findinterwikidb.jsp").forward(req, resp);
     }
 
-    public static boolean isEnglishNameOnly(String template) {
-        return template.matches("[.A-Za-z0-9_-]*");
-    }
-
-    public static boolean fillTranscludedInArticlesAndLangLinks(FindTemplateInterwikiBean bean) throws UnirestException, ParseException,
-            UnsupportedEncodingException {
-        List<Pair<String, String>> transcludedInLangLinks = QueryHelper.findTranscludedInArticlesAndLangLinksFull(bean.getPageLang(),
-                bean.getTitle());
-        if (transcludedInLangLinks.isEmpty()) {
-            return false;
-        }
-        for (Pair<String, String> transcludedInLangLink : transcludedInLangLinks) {
-            bean.addForeignLangAndForeignArticle(transcludedInLangLink.getLeft(), transcludedInLangLink.getRight());
-        }
-        return true;
-    }
-
-    // Find all templates without langwiki in pageLang for all foreign articles
-    public static void fillTemplatesInForeignArticlesWithoutLang(FindTemplateInterwikiBean bean, String foreignLang) throws ParseException,
-            UnirestException, UnsupportedEncodingException {
-        Set<String> foreignArticles = bean.getForeignArticles(foreignLang);
-        String excludeLang = bean.getPageLang();
-        for (String foreignArticle : foreignArticles) {
-            Set<String> templates = QueryHelper.findAllTemplates(bean.getInterwikiStorage(), foreignLang, foreignArticle);
-            for (String template : templates) {
-                UnifiedTemplate unifiedTemplate = bean.getInterwikiStorage().findUnifiedTemplate(foreignLang, template);
-                if (!unifiedTemplate.has(excludeLang)) {
-                    bean.addForeignLangAndForeignTemplateCandidate(foreignLang, unifiedTemplate);
-                }
-            }
-        }
+    @Override
+    public void destroy() {
+        super.destroy();
+        ConnectionFactory.stop();
     }
 
 }

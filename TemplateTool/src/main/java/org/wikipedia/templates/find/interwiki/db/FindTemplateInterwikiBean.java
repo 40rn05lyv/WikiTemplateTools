@@ -1,79 +1,74 @@
 package org.wikipedia.templates.find.interwiki.db;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
 import java.util.Set;
+
+import org.apache.commons.lang3.StringUtils;
+import org.wikipedia.api.Constants;
 
 public class FindTemplateInterwikiBean {
 
-    private String pageLang;
-    private String templateTitle;
-    private TemplateInterwikiStorage interwikiStorage = new TemplateInterwikiStorage();
-    private Map<String, Set<String>> foreignLangToForeignArticlesMap = new HashMap<String, Set<String>>();
-    private Map<UnifiedTemplate, TemplateInterwikiCandidate> candidatesMap = new HashMap<UnifiedTemplate, TemplateInterwikiCandidate>();
-    
-    public FindTemplateInterwikiBean(String pageLang, String templateTitle) {
-        this.pageLang = pageLang;
-        if (templateTitle.startsWith("Template:")) {
-            this.templateTitle = templateTitle.substring("Template:".length());
-        } else {
-            this.templateTitle = templateTitle;
-        }
+    private String templateName;
+    private String templateLang;
+    private Set<String> searchLangs;
+    private boolean freeze;
+    private boolean templateExists;
+    private static final String[] supportedLangs = Constants.SUPPORTED_LANGS;
+    private FindTemplateInterwikiResult result;
+
+    public String getTemplateName() {
+        return templateName;
     }
 
-    public Set<String> getForeignLangs() {
-        return foreignLangToForeignArticlesMap.keySet();
+    public void setTemplateName(String templateName) {
+        this.templateName = templateName;
     }
 
-    public Set<String> getForeignArticles(String lang) {
-        return foreignLangToForeignArticlesMap.get(lang);
+    public String getTemplateLang() {
+        return templateLang;
     }
 
-    public String getPageLang() {
-        return pageLang;
+    public void setTemplateLang(String templateLang) {
+        this.templateLang = templateLang;
     }
 
-    public String getTitle() {
-        return templateTitle;
+    public boolean isFreeze() {
+        return freeze;
     }
 
-    public TemplateInterwikiStorage getInterwikiStorage() {
-        return interwikiStorage;
+    public void setFreeze(boolean freeze) {
+        this.freeze = freeze;
     }
 
-    public void addForeignLangAndForeignArticle(String foreignLang, String foreignArticleTitle) {
-        Set<String> articles = foreignLangToForeignArticlesMap.get(foreignLang);
-        if (articles == null) {
-            articles = new HashSet<String>();
-            this.foreignLangToForeignArticlesMap.put(foreignLang, articles);
-        }
-        articles.add(foreignArticleTitle);
+    public boolean isTemplateExists() {
+        return templateExists;
     }
 
-    public void addForeignLangAndForeignTemplateCandidate(String foreignLang, UnifiedTemplate foreignTemplateCandidate) {
-        TemplateInterwikiCandidate templateMap = candidatesMap.get(foreignTemplateCandidate);
-        if (templateMap == null) {
-            templateMap = new TemplateInterwikiCandidate(foreignTemplateCandidate);
-            candidatesMap.put(foreignTemplateCandidate, templateMap);
-        }
-        templateMap.add(foreignLang);
+    public void setTemplateExists(boolean templateExists) {
+        this.templateExists = templateExists;
     }
 
-    public List<TemplateInterwikiCandidate> getCandidatesOrdered() {
-        List<TemplateInterwikiCandidate> result = new ArrayList<TemplateInterwikiCandidate>();
-        result.addAll(candidatesMap.values());
-        Collections.sort(result, new Comparator<TemplateInterwikiCandidate>() {
-            @Override
-            public int compare(TemplateInterwikiCandidate o1, TemplateInterwikiCandidate o2) {
-                return o2.size().compareTo(o1.size());
-            }
-        });
+    public Set<String> getSearchLangs() {
+        return searchLangs;
+    }
+
+    public String getSearchLangsForDisplay() {
+        return StringUtils.join(searchLangs, ", ");
+    }
+
+    public void setSearchLangs(Set<String> searchLangs) {
+        this.searchLangs = searchLangs;
+    }
+
+    public FindTemplateInterwikiResult getResult() {
         return result;
+    }
+
+    public void setResult(FindTemplateInterwikiResult result) {
+        this.result = result;
+    }
+
+    public String[] getSupportedLangs() {
+        return supportedLangs;
     }
 
 }

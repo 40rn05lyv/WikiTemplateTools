@@ -2,17 +2,20 @@ package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.Set;
 
+import org.wikipedia.api.PageUtils;
+import org.wikipedia.api.UnifiedPage;
+
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
 
-public class TemplateInterwikiCandidate {
+public class InterwikiCandidate {
 
     Multiset<String> langs = HashMultiset.create();
-    UnifiedTemplate template;
+    UnifiedPage page;
 
-    public TemplateInterwikiCandidate(UnifiedTemplate template) {
+    public InterwikiCandidate(UnifiedPage page) {
         super();
-        this.template = template;
+        this.page = page;
     }
 
     public void add(String lang) {
@@ -28,7 +31,7 @@ public class TemplateInterwikiCandidate {
     }
 
     public String get(String lang) {
-        Set<String> set = this.template.get(lang);
+        Set<String> set = this.page.get(lang);
         if (set == null || set.isEmpty()) {
             return null;
         }
@@ -36,12 +39,10 @@ public class TemplateInterwikiCandidate {
     }
 
     public String getForDisplay(String lang) {
-        String template = get(lang);
-        if (template.indexOf(':') != -1) {
-            template = template.substring(template.indexOf(':') + 1);
-        }
-        template = template.replaceAll("_", " ");
-        return template;
+        String page = get(lang);
+        page = PageUtils.removeNamespace(page);
+        page = PageUtils.toNormalView(page);
+        return page;
     }
 
     @Override
@@ -49,7 +50,7 @@ public class TemplateInterwikiCandidate {
         StringBuilder sb = new StringBuilder();
         sb.append(langs.toString());
         sb.append("\n");
-        sb.append(template.toString());
+        sb.append(page.toString());
         sb.append("\n");
         return sb.toString();
     }

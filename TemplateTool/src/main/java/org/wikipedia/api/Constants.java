@@ -15,6 +15,6 @@ public class Constants {
             "ia", "id", "io", "is", "it", "ja", "jv", "ka", "kk", "kn", "ko", "ku", "ky", "la", "lb", "lmo", "lt", "lv", "map-bms", "mg",
             "min", "mk", "ml", "mn", "mr", "ms", "my", "mzn", "nah", "nap", "nds", "ne", "new", "nl", "nn", "no", "oc", "os", "pa", "pl",
             "pms", "pnb", "pt", "qu", "ro", "ru", "sah", "scn", "sco", "sh", "si", "simple", "sk", "sl", "sq", "sr", "su", "sv", "sw",
-            "ta", "te", "tg", "th", "tl", "tr", "tt", "uk", "ur", "uz", "vec", "vi", "vo", "wa", "war", "yi", "yo", "zh", "zh-min-nan",
+            "ta", "te", "tg", "th", "tl", "tr", "tt", "uk", "ur", "uz", "vec", "vi", "vo", "wa", "war", "yi", "yo", "zh",
             "zh-yue" };
 }

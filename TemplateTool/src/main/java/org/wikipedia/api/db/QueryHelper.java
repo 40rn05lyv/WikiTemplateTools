@@ -12,7 +12,8 @@ import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
-import org.wikipedia.templates.find.interwiki.db.TemplateInterwikiStorage;
+import org.wikipedia.api.PageInterwikiStorage;
+import org.wikipedia.api.PageUtils;
 
 public class QueryHelper {
 
@@ -31,7 +32,7 @@ public class QueryHelper {
     // @formatter:on
 
     public static List<String> getLinksHereTemplatesWithoutInterwiki(String lang, String templateTitle, int offset, int limit) {
-        templateTitle = DbUtils.toDBView(templateTitle);
+        templateTitle = PageUtils.toDBView(templateTitle);
         List<String> list = new ArrayList<String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(linksHereWithoutInterwikiQuery);
@@ -100,6 +101,10 @@ public class QueryHelper {
     // TODO: can be very slow!
     public static boolean doesTemplateExist(String lang, String pageTitle) {
         long start = System.currentTimeMillis();
+        pageTitle = PageUtils.toDBView(pageTitle);
+        if (pageTitle.startsWith("Template:")) {
+            pageTitle = pageTitle.substring("Template:".length());
+        }
         System.out.println("doesTemplateExist: " + lang + ", " + pageTitle);
         boolean hasTemplate = false;
         try {
@@ -194,8 +199,9 @@ public class QueryHelper {
             + "WHERE tl_title=? AND tl_namespace=10 AND page_namespace=0;";
 
     public static List<Pair<String, String>> findTranscludedInArticlesAndLangLinksFull(String pageLang, String templateTitle) {
+        templateTitle = PageUtils.toDBView(templateTitle);
         if (templateTitle.startsWith("Template:")) {
-            throw new IllegalArgumentException("Wrong template title: " + templateTitle);
+            templateTitle = templateTitle.substring("Template:".length());
         }
         List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
         try {
@@ -229,7 +235,7 @@ public class QueryHelper {
     // @formatter:on
     
     // @return list of all templates
-    public static Set<String> findAllTemplates(TemplateInterwikiStorage interwikiStorage, String lang, String article) {
+    public static Set<String> findAllTemplates(PageInterwikiStorage interwikiStorage, String lang, String article) {
         article = fixArticleName(article);
         Set<String> result = new HashSet<String>();
         try {

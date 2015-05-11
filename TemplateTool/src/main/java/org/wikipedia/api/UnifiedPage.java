@@ -1,15 +1,21 @@
-package org.wikipedia.templates.find.interwiki.db;
+package org.wikipedia.api;
 
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
-public class UnifiedTemplate {
-    
+public class UnifiedPage {
+
+    private final int namespace;
+
+    public UnifiedPage(int namespace) {
+        this.namespace = namespace;
+    }
+
     private Map<String, Set<String>> langToTitlesMap = new HashMap<String, Set<String>>();
 
-    void putInterwiki(String lang, String title) {
+    public void putInterwiki(String lang, String title) {
         if (lang == null || title == null) {
             return;
         }
@@ -18,7 +24,7 @@ public class UnifiedTemplate {
             titles = new HashSet<String>();
             langToTitlesMap.put(lang, titles);
         }
-        title = unify(lang, title);
+        title = PageUtils.addNamespace(lang, title, namespace);
         titles.add(title);
     }
 
@@ -28,14 +34,6 @@ public class UnifiedTemplate {
 
     public Set<String> get(String lang) {
         return langToTitlesMap.get(lang);
-    }
-
-    static String unify(String lang, String title) {
-        if (title.indexOf(":") == -1) {
-            String namespace = TemplateInterwikiStorage.getTemplateNamespaceName(lang);
-            title = namespace + ":" + title;
-        }
-        return title;
     }
 
     @Override
