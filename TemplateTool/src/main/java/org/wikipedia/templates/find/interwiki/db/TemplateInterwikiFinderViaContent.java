@@ -59,12 +59,8 @@ public class TemplateInterwikiFinderViaContent extends AbstractTemplateInterwiki
         for (String article : foreignArticles) {
             Set<String> linkHereTemplates = QueryHelper.findAllTemplatesThatHaveLinksToPage(foreignLang, article,
                     Constants.NAMESPACE_ARTICLE);
-            PageInterwikiStorage storage = QueryHelper.findLangLinks(foreignLang, linkHereTemplates, Constants.NAMESPACE_TEMPLATE, interwikiStorage);
-            boolean added = interwikiStorage.addStorage(storage);
-            if (!added) {
-                throw new IllegalStateException("Interwiki storage does not work properly.");
-            }
-            for (UnifiedPage page : storage.getPages()) {
+            QueryHelper.findLangLinks(foreignLang, linkHereTemplates, Constants.NAMESPACE_TEMPLATE, interwikiStorage);
+            for (UnifiedPage page : interwikiStorage.getPages()) {
                 if (!page.has(excludeLang)) {
                     addForeignLangAndForeignTemplateCandidate(foreignLang, page);
                 }
