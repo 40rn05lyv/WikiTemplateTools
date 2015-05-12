@@ -73,7 +73,7 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
         bean.setFreeze(freeze);
 
         if (!freeze) {
-            ITemplateInterwikiFinder processor = new TemplateInterwikiFinderViaLinks(templateLang, templateName, searchLangs);
+            ITemplateInterwikiFinder processor = new TemplateInterwikiFinderViaContent(templateLang, templateName, searchLangs);
             TemplateInterwikiFinderResult result = processor.process();
             bean.setResult(result);
             // TODO: show number of transclusion

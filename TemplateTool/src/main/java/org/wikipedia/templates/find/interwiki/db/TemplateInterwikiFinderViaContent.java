@@ -41,7 +41,7 @@ public class TemplateInterwikiFinderViaContent extends AbstractTemplateInterwiki
 
     private boolean fillLinksToArticlesAndLangLinks() {
         Set<String> pureLinks = QueryHelper.findPureLinksInTemplate(templateLang, templateName, Constants.NAMESPACE_ARTICLE);
-        PageInterwikiStorage storage = QueryHelper.findLangLinks(templateLang, pureLinks, Constants.NAMESPACE_ARTICLE);
+        PageInterwikiStorage storage = QueryHelper.findLangLinks(templateLang, pureLinks, Constants.NAMESPACE_ARTICLE, interwikiStorage);
         if (storage.isEmpty()) {
             return false;
         }
@@ -53,19 +53,21 @@ public class TemplateInterwikiFinderViaContent extends AbstractTemplateInterwiki
         return true;
     }
 
-    // Find all templates without langwiki in pageLang for all foreign articles
     private void fillTemplatesInForeignArticlesWithoutLang(String foreignLang) {
         Set<String> foreignArticles = getForeignArticles(foreignLang);
         String excludeLang = templateLang;
-        Set<String> linkHereTemplates = QueryHelper.findAllTemplatesThatLinksToPages(foreignLang, foreignArticles, Constants.NAMESPACE_ARTICLE);
-        PageInterwikiStorage storage = QueryHelper.findLangLinks(foreignLang, linkHereTemplates, Constants.NAMESPACE_TEMPLATE);
-        boolean added = interwikiStorage.addStorage(storage);
-        if (!added) {
-            throw new IllegalStateException("Interwiki storage does not work properly.");
-        }
-        for (UnifiedPage page : storage.getPages()) {
-            if (!page.has(excludeLang)) {
-                addForeignLangAndForeignTemplateCandidate(foreignLang, page);
+        for (String article : foreignArticles) {
+            Set<String> linkHereTemplates = QueryHelper.findAllTemplatesThatHaveLinksToPage(foreignLang, article,
+                    Constants.NAMESPACE_ARTICLE);
+            PageInterwikiStorage storage = QueryHelper.findLangLinks(foreignLang, linkHereTemplates, Constants.NAMESPACE_TEMPLATE, interwikiStorage);
+            boolean added = interwikiStorage.addStorage(storage);
+            if (!added) {
+                throw new IllegalStateException("Interwiki storage does not work properly.");
+            }
+            for (UnifiedPage page : storage.getPages()) {
+                if (!page.has(excludeLang)) {
+                    addForeignLangAndForeignTemplateCandidate(foreignLang, page);
+                }
             }
         }
     }

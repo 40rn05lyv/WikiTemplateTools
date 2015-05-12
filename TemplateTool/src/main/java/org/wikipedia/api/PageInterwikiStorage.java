@@ -47,11 +47,12 @@ public class PageInterwikiStorage {
     }
 
     public boolean addStorage(PageInterwikiStorage storage) {
-        if (namespace == storage.namespace) {
+        if (namespace != storage.namespace) {
             return false;
         }
+        // TODO: not correct:
         pages.addAll(storage.getPages());
         return true;
     }
-
+    
 }

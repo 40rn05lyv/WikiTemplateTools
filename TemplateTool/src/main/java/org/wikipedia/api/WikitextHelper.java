@@ -22,11 +22,11 @@ public class WikitextHelper {
             }
             if (index != -1) {
                 String link = wikiLink.substring(2, index).trim();
-                System.out.println("Found link: " + link);
+                //System.out.println("Found link: " + link);
                 result.add(link);
             } else {
                 String link = wikiLink.substring(2, wikiLink.length() - 2).trim();
-                System.out.println("Found clean link: " + link);
+                //System.out.println("Found clean link: " + link);
                 result.add(link);
             }
         }

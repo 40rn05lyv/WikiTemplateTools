@@ -275,6 +275,7 @@ public class QueryHelper {
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findTranscludedInArticlesAndLangLinksFullQuery);
             st.setString(1, templateTitle);
+            System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
                 String pl_title = new String(set.getBytes("pl_title"), "UTF-8");
@@ -305,6 +306,7 @@ public class QueryHelper {
             st.setString(1, page);
             st.setInt(2, pageNamespace);
             st.setInt(3, linksNamespace);
+            System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
                 String pl_title = new String(set.getBytes("pl_title"), "UTF-8");
@@ -351,10 +353,8 @@ public class QueryHelper {
             + "WHERE page_title IN (%s) AND page_namespace=?;";
     // @formatter:on
 
-    public static PageInterwikiStorage findLangLinks(String pageLang, Set<String> pages, int pagesNamespace) {
-        PageInterwikiStorage storage = new PageInterwikiStorage(pagesNamespace);
-        
-        if (pages == null) {
+    public static PageInterwikiStorage findLangLinks(String pageLang, Set<String> pages, int pagesNamespace, PageInterwikiStorage storage) {
+        if (pages == null || pages.isEmpty()) {
             return storage;
         }
 
@@ -374,6 +374,7 @@ public class QueryHelper {
                 st.setString(i++, page);
             }
             st.setInt(i++, pagesNamespace);
+            System.out.println("Querying " + pageLang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
                 String page_title = new String(set.getBytes("page_title"), "UTF-8");
@@ -415,6 +416,7 @@ public class QueryHelper {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findLangLinksQuery_SinglePage);
             st.setString(1, page);
             st.setString(2, namespace);
+            System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
                 String page_title = new String(set.getBytes("page_title"), "UTF-8");
@@ -427,11 +429,36 @@ public class QueryHelper {
             e.printStackTrace();
         }
         return result;
-    }
-
-    public static Set<String> findAllTemplatesThatLinksToPages(String lang, Set<String> pages, int pagesNamespace) {
-        
-        return null;
+    }    
+    
+    // @formatter:off
+    private static final String findAllTemplatesThatLinksToPageQuery = 
+            "SELECT page_title "
+            + "FROM page INNER JOIN pagelinks ON page_id=pl_from "
+            + "WHERE page_namespace=10 AND pl_title=? AND pl_namespace=?;";
+    // @formatter:on
+    
+    public static Set<String> findAllTemplatesThatHaveLinksToPage(String lang, String page, int pagesNamespace) {
+        page = PageUtils.toDBView(page);
+        page = PageUtils.removeNamespace(page);
+        Set<String> result = new HashSet<String>();
+        try {
+            PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findAllTemplatesThatLinksToPageQuery);
+            int i=1;
+            st.setString(i++, page);
+            st.setInt(i++, pagesNamespace);
+            System.out.println("Querying " + lang + ": " + st.toString());
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String page_title = new String(set.getBytes("page_title"), "UTF-8");
+                result.add(page_title);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
     }
 
 }
