@@ -31,15 +31,14 @@ public class InterwikiCandidate {
     }
 
     public String get(String lang) {
-        Set<String> set = this.page.get(lang);
-        if (set == null || set.isEmpty()) {
-            return null;
-        }
-        return (String) set.toArray()[0];
+        return page.getOne(lang);
     }
 
     public String getForDisplay(String lang) {
         String page = get(lang);
+        if (page == null) {
+            return null;
+        }
         page = PageUtils.removeNamespace(page);
         page = PageUtils.toNormalView(page);
         return page;

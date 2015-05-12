@@ -10,6 +10,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 import org.wikipedia.api.Constants;
 
+import com.google.common.base.Optional;
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
@@ -17,10 +18,10 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import com.mashape.unirest.request.HttpRequest;
 
 public class ApiHelper {
-    
+
     private static final String DEFAULT_WIKI = "en";
     static String defaultApiUrl = api(DEFAULT_WIKI);
-    
+
     private static String api(String lang) {
         return "http://" + lang + ".wikipedia.org/w/api.php";
     }
@@ -32,7 +33,7 @@ public class ApiHelper {
         if (pages.has("-1")) {
             return false;
         }
-        for (Object page: pages.keySet()) {
+        for (Object page : pages.keySet()) {
             JSONObject pageObj = pages.getJSONObject((String) page);
             if (pageObj.getInt("ns") == Constants.NAMESPACE_TEMPLATE) {
                 return true;
@@ -40,8 +41,9 @@ public class ApiHelper {
         }
         return false;
     }
-    
-    public static JSONObject findTranscludedInArticlesAndLangLinksFull(String pageLang, String pageTitle) throws UnirestException, ParseException {
+
+    public static JSONObject findTranscludedInArticlesAndLangLinksFull(String pageLang, String pageTitle) throws UnirestException,
+            ParseException {
         return queryToTheEnd(new IHttpRequestBuilder() {
             @Override
             public HttpRequest build() {
@@ -60,7 +62,7 @@ public class ApiHelper {
             }
         });
     }
-    
+
     public static JSONObject findTranscludedInArticles(String pageLang, String pageTitle) throws UnirestException, ParseException {
         return queryToTheEnd(new IHttpRequestBuilder() {
             @Override
@@ -87,9 +89,9 @@ public class ApiHelper {
         while (lastObj.has("query-continue")) {
             HttpRequest request = requestBuilder.build();
             JSONObject queryContinueObj = lastObj.getJSONObject("query-continue");
-            for (Object queryContinueElem: queryContinueObj.keySet()) {
+            for (Object queryContinueElem : queryContinueObj.keySet()) {
                 JSONObject continueObj = queryContinueObj.getJSONObject((String) queryContinueElem);
-                for (Object continueElem: continueObj.keySet()) {
+                for (Object continueElem : continueObj.keySet()) {
                     String continueElemStr = (String) continueElem;
                     request.queryString(continueElemStr, continueObj.getString(continueElemStr));
                 }
@@ -101,8 +103,9 @@ public class ApiHelper {
         }
         return resultObj;
     }
-    
-    public static JSONObject findAllTemplatesWithLangLink(final String article, String articlesLang, String targetLang) throws ParseException, UnirestException {
+
+    public static JSONObject findAllTemplatesWithLangLink(final String article, String articlesLang, String targetLang)
+            throws ParseException, UnirestException {
         return queryToTheEnd(new IHttpRequestBuilder() {
             @Override
             public HttpRequest build() {
@@ -122,17 +125,18 @@ public class ApiHelper {
         });
     }
 
-    public static JSONObject findAllTemplatesWithLangLink(final Set<String> articles, String articlesLang, String targetLang) throws ParseException, UnirestException {
+    public static JSONObject findAllTemplatesWithLangLink(final Set<String> articles, String articlesLang, String targetLang)
+            throws ParseException, UnirestException {
         // TODO: more than 50 titles can't be processed
         if (articles.size() > 50) {
-            for (String article: articles) {
+            for (String article : articles) {
                 articles.remove(article);
                 if (articles.size() == 50) {
                     break;
                 }
             }
         }
-        
+
         return queryToTheEnd(new IHttpRequestBuilder() {
             @Override
             public HttpRequest build() {
@@ -179,7 +183,27 @@ public class ApiHelper {
         }
         return namespaceName;
     }
-    
-    
+
+    public static Optional<String> expandTemplate(String lang, String template) {
+        // @formatter:off
+        HttpRequest request = Unirest.get(api(lang))
+                .queryString("format", "json")
+                .queryString("action", "expandtemplates")
+                .queryString("text", "{{" + template + "}}");
+        // @formatter:on
+        Optional<String> expandedTemplate = Optional.absent();
+        try {
+            JSONObject json = request.asJson().getBody().getObject();
+            if (json != null && json.has("expandtemplates")) {
+                JSONObject expandTemplatesObject = json.getJSONObject("expandtemplates");
+                if (expandTemplatesObject != null && expandTemplatesObject.has("*")) {
+                    expandedTemplate = Optional.of(expandTemplatesObject.getString("*"));
+                }
+            }
+        } catch (UnirestException e) {
+            e.printStackTrace();
+        }
+        return expandedTemplate;
+    }
 
 }

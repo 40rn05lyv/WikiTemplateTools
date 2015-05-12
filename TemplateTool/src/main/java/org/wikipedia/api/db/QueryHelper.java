@@ -6,14 +6,21 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
+import org.wikipedia.api.Constants;
 import org.wikipedia.api.PageInterwikiStorage;
 import org.wikipedia.api.PageUtils;
+import org.wikipedia.api.WikitextHelper;
+import org.wikipedia.api.http.ApiHelper;
+
+import com.google.common.base.Optional;
 
 public class QueryHelper {
 
@@ -53,11 +60,11 @@ public class QueryHelper {
         }
         return list;
     }
-    
+
     public static List<String> getLinksHereTemplatesWithoutInterwiki(String lang, String parentTemplate) {
         return getLinksHereTemplatesWithoutInterwiki(lang, parentTemplate, 0, Integer.MAX_VALUE);
     }
-    
+
     // @formatter:off
     static String getAllTemplatesWithoutInterwikiQuery = 
             "SELECT page_title "
@@ -86,7 +93,7 @@ public class QueryHelper {
         }
         return list;
     }
-    
+
     public static List<String> getAllTemplatesWithoutInterwiki(String lang) {
         return getAllTemplatesWithoutInterwiki(lang, 0, Integer.MAX_VALUE);
     }
@@ -102,9 +109,7 @@ public class QueryHelper {
     public static boolean doesTemplateExist(String lang, String pageTitle) {
         long start = System.currentTimeMillis();
         pageTitle = PageUtils.toDBView(pageTitle);
-        if (pageTitle.startsWith("Template:")) {
-            pageTitle = pageTitle.substring("Template:".length());
-        }
+        pageTitle = PageUtils.removeNamespace(pageTitle);
         System.out.println("doesTemplateExist: " + lang + ", " + pageTitle);
         boolean hasTemplate = false;
         try {
@@ -130,7 +135,7 @@ public class QueryHelper {
             + ") sub INNER JOIN page ON sub.tl_title=page.page_title LEFT JOIN langlinks ON page.page_id=langlinks.ll_from "
             + "WHERE page_namespace=10;";
     // @formatter:on
-    
+
     // @formatter:off
     static String findTemplatesWithLangFilter = 
             "SELECT sub.tl_title "
@@ -143,7 +148,6 @@ public class QueryHelper {
             + "GROUP BY sub.tl_title "
             + "HAVING MAX(CASE WHEN ll_lang=? THEN 1 ELSE 0 END) = 0;";
     // @formatter:on
-    
 
     // Map of templates to its langlinks
     public static List<String> findTemplatesWithLangFilter(String lang, String article, String bannedLang) {
@@ -167,7 +171,7 @@ public class QueryHelper {
         }
         return result;
     }
-    
+
     private static String fixArticleName(String name) {
         return name.replaceAll(" ", "_");
     }
@@ -200,9 +204,7 @@ public class QueryHelper {
 
     public static List<Pair<String, String>> findTranscludedInArticlesAndLangLinksFull(String pageLang, String templateTitle) {
         templateTitle = PageUtils.toDBView(templateTitle);
-        if (templateTitle.startsWith("Template:")) {
-            templateTitle = templateTitle.substring("Template:".length());
-        }
+        templateTitle = PageUtils.removeNamespace(templateTitle);
         List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(pageLang).prepareStatement(
@@ -233,7 +235,7 @@ public class QueryHelper {
             + ") sub INNER JOIN page ON sub.tl_title=page_title LEFT JOIN langlinks ON page_id=ll_from "
             + "WHERE page_namespace=10;";
     // @formatter:on
-    
+
     // @return list of all templates
     public static Set<String> findAllTemplates(PageInterwikiStorage interwikiStorage, String lang, String article) {
         article = fixArticleName(article);
@@ -248,7 +250,7 @@ public class QueryHelper {
                 String tl_title = new String(set.getBytes("sub.tl_title"), "UTF-8");
                 String ll_lang = set.getString("langlinks.ll_lang");
                 String ll_title = null;
-                if (set.getBytes("langlinks.ll_title")!=null) {
+                if (set.getBytes("langlinks.ll_title") != null) {
                     ll_title = new String(set.getBytes("langlinks.ll_title"), "UTF-8");
                 }
                 interwikiStorage.addInterwiki(lang, tl_title, ll_lang, ll_title);
@@ -260,6 +262,176 @@ public class QueryHelper {
             e.printStackTrace();
         }
         return result;
+    }
+
+    static String findAllLinksAndLangLinksQuery = "SELECT pl_title, ll_lang, ll_title "
+            + "FROM page INNER JOIN pagelinks ON page_id=pl_from INNER JOIN langlinks ON page_id=ll_from "
+            + "WHERE page_title=? AND page_namespace=10 AND pl_namespace=0;";
+
+    private static List<Pair<String, String>> findAllLinksAndLangLinks(String lang, String templateTitle) {
+        templateTitle = PageUtils.toDBView(templateTitle);
+        templateTitle = PageUtils.removeNamespace(templateTitle);
+        List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
+        try {
+            PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findTranscludedInArticlesAndLangLinksFullQuery);
+            st.setString(1, templateTitle);
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String pl_title = new String(set.getBytes("pl_title"), "UTF-8");
+                String ll_lang = set.getString("ll_lang");
+                String ll_title = new String(set.getBytes("ll_title"), "UTF-8");
+                result.add(Pair.of(ll_lang, ll_title));
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    // @formatter:off
+    private static String findAllLinksQuery = "SELECT pl_title " 
+            + "FROM page INNER JOIN pagelinks ON page_id=pl_from "
+            + "WHERE page_title=? AND page_namespace=? AND pl_namespace=?;";
+    // @formatter:on
+
+    private static Set<String> findAllLinks(String lang, String page, int pageNamespace, int linksNamespace) {
+        page = PageUtils.toDBView(page);
+        page = PageUtils.removeNamespace(page);
+        Set<String> result = new HashSet<String>();
+        try {
+            PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findAllLinksQuery);
+            st.setString(1, page);
+            st.setInt(2, pageNamespace);
+            st.setInt(3, linksNamespace);
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String pl_title = new String(set.getBytes("pl_title"), "UTF-8");
+                result.add(pl_title);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static Set<String> findPureLinksInTemplate(String lang, String template, int linksNamespace) {
+        Set<String> allLinks = findAllLinks(lang, template, Constants.NAMESPACE_TEMPLATE, linksNamespace);
+        Optional<String> expandedTemplate = ApiHelper.expandTemplate(lang, template);
+        if (expandedTemplate.isPresent()) {
+            Set<String> expandedLinks = WikitextHelper.getLinks(expandedTemplate.get());
+            
+            Set<String> allLinksConverted = new HashSet<String>();
+            for (String link: allLinks) {
+                link = PageUtils.toNormalView(link);
+                link = PageUtils.addNamespace(lang, link, linksNamespace);
+                allLinksConverted.add(PageUtils.toNormalView(link));
+            }
+            
+            Set<String> expandedLinksConverted = new HashSet<String>();
+            for (String link: expandedLinks) {
+                link = PageUtils.toNormalView(link);
+                link = PageUtils.addNamespace(lang, link, linksNamespace);
+                expandedLinksConverted.add(PageUtils.toNormalView(link));
+            }
+            
+            allLinksConverted.retainAll(expandedLinksConverted);
+            return allLinksConverted;
+        }
+        return new HashSet<String>();
+    }
+
+    // @formatter:off
+    private static final String findLangLinksQuery_MultiplePages = 
+            "SELECT page_title, ll_lang, ll_title "
+            + "FROM page INNER JOIN langlinks ON page_id=ll_from "
+            + "WHERE page_title IN (%s) AND page_namespace=?;";
+    // @formatter:on
+
+    public static PageInterwikiStorage findLangLinks(String pageLang, Set<String> pages, int pagesNamespace) {
+        PageInterwikiStorage storage = new PageInterwikiStorage(pagesNamespace);
+        
+        if (pages == null) {
+            return storage;
+        }
+
+        // Converting
+        Set<String> convertedPages = new HashSet<String>();
+        for (String page: pages) {
+            page = PageUtils.toDBView(page);
+            page = PageUtils.removeNamespace(page);
+            convertedPages.add(page);
+        }
+
+        try {
+            String query = String.format(findLangLinksQuery_MultiplePages, preparePlaceHolders(convertedPages.size()));
+            PreparedStatement st = ConnectionFactory.getConnection(pageLang).prepareStatement(query);
+            int i = 1;
+            for (String page : convertedPages) {
+                st.setString(i++, page);
+            }
+            st.setInt(i++, pagesNamespace);
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String page_title = new String(set.getBytes("page_title"), "UTF-8");
+                String ll_lang = set.getString("ll_lang");
+                String ll_title = new String(set.getBytes("ll_title"), "UTF-8");
+                storage.addInterwiki(pageLang, page_title, ll_lang, ll_title);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return storage;
+    }
+
+    public static String preparePlaceHolders(int length) {
+        StringBuilder builder = new StringBuilder(length * 2 - 1);
+        for (int i = 0; i < length; i++) {
+            if (i > 0)
+                builder.append(',');
+            builder.append('?');
+        }
+        return builder.toString();
+    }
+
+    // @formatter:off
+    private static final String findLangLinksQuery_SinglePage = 
+            "SELECT page_title, ll_lang "
+            + "FROM page INNER JOIN langlinks ON page_id=ll_from "
+            + "WHERE page_title=? AND page_namespace=?;";
+    // @formatter:on
+
+    // NOTE: it is better to use another findLangLinks implementation 
+    public static Map<String, String> findLangLinks(String lang, String page, String namespace) {
+        page = PageUtils.toDBView(page);
+        page = PageUtils.removeNamespace(page);
+        Map<String, String> result = new HashMap<String, String>();
+        try {
+            PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findLangLinksQuery_SinglePage);
+            st.setString(1, page);
+            st.setString(2, namespace);
+            ResultSet set = st.executeQuery();
+            while (set.next()) {
+                String page_title = new String(set.getBytes("page_title"), "UTF-8");
+                String ll_lang = set.getString("ll_lang");
+                result.put(ll_lang, page_title);
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return result;
+    }
+
+    public static Set<String> findAllTemplatesThatLinksToPages(String lang, Set<String> pages, int pagesNamespace) {
+        
+        return null;
     }
 
 }

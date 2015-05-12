@@ -2,10 +2,10 @@ package org.wikipedia.templates.find.interwiki.db;
 
 import java.util.List;
 
-public class FindTemplateInterwikiResult {
+public class TemplateInterwikiFinderResult {
 
     public static enum FindTemplateInterwikiResultEnum {
-        TEMPLATE_DONT_EXIST, NO_TRANSCLUSIONS, SUCCESS, HAS_INTERWIKI
+        TEMPLATE_DONT_EXIST, NO_TRANSCLUSIONS, NO_LINKS, SUCCESS, HAS_INTERWIKI, 
     }
 
     private FindTemplateInterwikiResultEnum result;
@@ -37,6 +37,10 @@ public class FindTemplateInterwikiResult {
 
     public boolean hasNoTransclusions() {
         return result == FindTemplateInterwikiResultEnum.NO_TRANSCLUSIONS;
+    }
+    
+    public boolean hasNoLinks() {
+        return result == FindTemplateInterwikiResultEnum.NO_LINKS;
     }
 
     public boolean hasInterwiki() {

@@ -13,7 +13,7 @@ public class FindTemplateInterwikiBean {
     private boolean freeze;
     private boolean templateExists;
     private static final String[] supportedLangs = Constants.SUPPORTED_LANGS;
-    private FindTemplateInterwikiResult result;
+    private TemplateInterwikiFinderResult result;
 
     public String getTemplateName() {
         return templateName;
@@ -59,11 +59,11 @@ public class FindTemplateInterwikiBean {
         this.searchLangs = searchLangs;
     }
 
-    public FindTemplateInterwikiResult getResult() {
+    public TemplateInterwikiFinderResult getResult() {
         return result;
     }
 
-    public void setResult(FindTemplateInterwikiResult result) {
+    public void setResult(TemplateInterwikiFinderResult result) {
         this.result = result;
     }
 

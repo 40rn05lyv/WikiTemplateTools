@@ -37,9 +37,21 @@ public class PageInterwikiStorage {
         }
         return null;
     }
-
+    
     public List<UnifiedPage> getPages() {
         return pages;
+    }
+
+    public boolean isEmpty() {
+        return pages.isEmpty();
+    }
+
+    public boolean addStorage(PageInterwikiStorage storage) {
+        if (namespace == storage.namespace) {
+            return false;
+        }
+        pages.addAll(storage.getPages());
+        return true;
     }
 
 }

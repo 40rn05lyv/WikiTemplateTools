@@ -1,8 +1,10 @@
 package org.wikipedia.api;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang3.StringUtils;
 import org.wikipedia.api.http.ApiHelper;
 
 public class PageUtils {
@@ -12,7 +14,7 @@ public class PageUtils {
      */
     private static Map<Integer, Map<String, String>> globalNamespaceMap = new HashMap<Integer, Map<String, String>>();
 
-    public static String getNamespaceName(String lang, int namespace) {
+    public static synchronized String getNamespaceName(String lang, int namespace) {
         Map<String, String> namespaceMap = globalNamespaceMap.get(namespace);
         if (namespaceMap == null) {
             namespaceMap = new HashMap<String, String>();
@@ -20,7 +22,7 @@ public class PageUtils {
         }
         String namespaceName = namespaceMap.get(lang);
         if (namespaceName == null) {
-            namespaceName = ApiHelper.findNamespaceName(lang, Constants.NAMESPACE_TEMPLATE);
+            namespaceName = ApiHelper.findNamespaceName(lang, namespace);
             namespaceMap.put(lang, namespaceName);
         }
         return namespaceName;
@@ -29,7 +31,9 @@ public class PageUtils {
     public static String addNamespace(String lang, String page, int namespace) {
         if (page.indexOf(":") == -1) {
             String namespaceName = getNamespaceName(lang, namespace);
-            page = namespaceName + ":" + page;
+            if (!StringUtils.isEmpty(namespaceName)) {
+                page = namespaceName + ":" + page;
+            }
         }
         return page;
     }

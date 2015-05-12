@@ -67,6 +67,9 @@
         <c:if test="${bean.result.hasNoTransclusions()}">
           <div class="alert alert-danger" role="alert">This template does not have transclusions. Unable to determine interwiki.</div>
         </c:if>
+        <c:if test="${bean.result.hasNoLinks()}">
+          <div class="alert alert-danger" role="alert">This template does not have links to articles. Unable to determine interwiki.</div>
+        </c:if>
         <c:if test="${bean.result.hasInterwiki()}">
           <div class="alert alert-info" role="alert">This template already has interwiki.</div>
         </c:if>

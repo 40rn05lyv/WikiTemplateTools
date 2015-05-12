@@ -35,6 +35,18 @@ public class UnifiedPage {
     public Set<String> get(String lang) {
         return langToTitlesMap.get(lang);
     }
+    
+    public String getOne(String lang) {
+        Set<String> set = langToTitlesMap.get(lang);
+        if (set == null || set.isEmpty()) {
+            return null;
+        }
+        return (String) set.toArray()[0];
+    }
+    
+    public Set<String> getLangs() {
+        return langToTitlesMap.keySet();
+    }
 
     @Override
     public String toString() {
