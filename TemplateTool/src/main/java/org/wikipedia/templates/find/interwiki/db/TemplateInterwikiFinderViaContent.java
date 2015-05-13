@@ -41,11 +41,11 @@ public class TemplateInterwikiFinderViaContent extends AbstractTemplateInterwiki
 
     private boolean fillLinksToArticlesAndLangLinks() {
         Set<String> pureLinks = QueryHelper.findPureLinksInTemplate(templateLang, templateName, Constants.NAMESPACE_ARTICLE);
-        PageInterwikiStorage storage = QueryHelper.findLangLinks(templateLang, pureLinks, Constants.NAMESPACE_ARTICLE, interwikiStorage);
-        if (storage.isEmpty()) {
+        QueryHelper.findLangLinks(templateLang, pureLinks, Constants.NAMESPACE_ARTICLE, interwikiStorage);
+        if (interwikiStorage.isEmpty()) {
             return false;
         }
-        for (UnifiedPage page : storage.getPages()) {
+        for (UnifiedPage page : interwikiStorage.getPages()) {
             for (String lang : page.getLangs()) {
                 addForeignLangAndForeignArticle(lang, page.getOne(lang));
             }
