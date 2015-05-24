@@ -35,7 +35,7 @@ public class UnifiedPage {
     public Set<String> get(String lang) {
         return langToTitlesMap.get(lang);
     }
-    
+
     public String getOne(String lang) {
         Set<String> set = langToTitlesMap.get(lang);
         if (set == null || set.isEmpty()) {
@@ -43,22 +43,26 @@ public class UnifiedPage {
         }
         return (String) set.toArray()[0];
     }
-    
+
     public Set<String> getLangs() {
         return langToTitlesMap.keySet();
+    }
+
+    public int getNamespace() {
+        return namespace;
     }
 
     @Override
     public String toString() {
         return langToTitlesMap.toString();
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         // TODO Auto-generated method stub
         return super.equals(obj);
     }
-    
+
     @Override
     public int hashCode() {
         // TODO Auto-generated method stub

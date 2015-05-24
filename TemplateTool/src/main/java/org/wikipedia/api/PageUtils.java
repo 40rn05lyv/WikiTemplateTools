@@ -37,8 +37,12 @@ public class PageUtils {
         }
         return page;
     }
+    
+    public static String removeTemplateNamespace(String lang, String page) {
+        return removeNamespace(lang, page, Constants.NAMESPACE_TEMPLATE);
+    }
 
-    public static String removeNamespace(String page) {
+    public static String removeNamespace(String lang, String page, int namespace) {
         if (page == null) {
             throw new NullPointerException();
         }
@@ -46,7 +50,11 @@ public class PageUtils {
         if (colonIndex == -1) {
             return page;
         }
-        return page.substring(colonIndex + 1);
+        String namespaceName = getNamespaceName(lang, namespace);
+        if (!StringUtils.isEmpty(namespaceName) && page.startsWith(namespaceName)) {
+            page = page.substring(namespaceName.length() + 1);
+        }
+        return page;
     }
 
     public static String toDBView(String page) {

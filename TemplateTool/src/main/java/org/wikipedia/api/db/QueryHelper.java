@@ -109,7 +109,7 @@ public class QueryHelper {
     public static boolean doesTemplateExist(String lang, String pageTitle) {
         long start = System.currentTimeMillis();
         pageTitle = PageUtils.toDBView(pageTitle);
-        pageTitle = PageUtils.removeNamespace(pageTitle);
+        pageTitle = PageUtils.removeTemplateNamespace(lang, pageTitle);
         System.out.println("doesTemplateExist: " + lang + ", " + pageTitle);
         boolean hasTemplate = false;
         try {
@@ -204,7 +204,7 @@ public class QueryHelper {
 
     public static List<Pair<String, String>> findTranscludedInArticlesAndLangLinksFull(String pageLang, String templateTitle) {
         templateTitle = PageUtils.toDBView(templateTitle);
-        templateTitle = PageUtils.removeNamespace(templateTitle);
+        templateTitle = PageUtils.removeTemplateNamespace(pageLang, templateTitle);
         List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(pageLang).prepareStatement(
@@ -270,7 +270,7 @@ public class QueryHelper {
 
     private static List<Pair<String, String>> findAllLinksAndLangLinks(String lang, String templateTitle) {
         templateTitle = PageUtils.toDBView(templateTitle);
-        templateTitle = PageUtils.removeNamespace(templateTitle);
+        templateTitle = PageUtils.removeTemplateNamespace(lang, templateTitle);
         List<Pair<String, String>> result = new ArrayList<Pair<String, String>>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findTranscludedInArticlesAndLangLinksFullQuery);
@@ -299,7 +299,7 @@ public class QueryHelper {
 
     private static Set<String> findAllLinks(String lang, String page, int pageNamespace, int linksNamespace) {
         page = PageUtils.toDBView(page);
-        page = PageUtils.removeNamespace(page);
+        page = PageUtils.removeNamespace(lang, page, pageNamespace);
         Set<String> result = new HashSet<String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findAllLinksQuery);
@@ -349,7 +349,7 @@ public class QueryHelper {
     // @formatter:off
     private static final String findLangLinksQuery_MultiplePages = 
             "SELECT page_title, ll_lang, ll_title "
-            + "FROM page INNER JOIN langlinks ON page_id=ll_from "
+            + "FROM page LEFT JOIN langlinks ON page_id=ll_from "
             + "WHERE page_title IN (%s) AND page_namespace=?;";
     // @formatter:on
 
@@ -362,7 +362,7 @@ public class QueryHelper {
         Set<String> convertedPages = new HashSet<String>();
         for (String page: pages) {
             page = PageUtils.toDBView(page);
-            page = PageUtils.removeNamespace(page);
+            page = PageUtils.removeNamespace(pageLang, page, pagesNamespace);
             convertedPages.add(page);
         }
 
@@ -379,7 +379,10 @@ public class QueryHelper {
             while (set.next()) {
                 String page_title = new String(set.getBytes("page_title"), "UTF-8");
                 String ll_lang = set.getString("ll_lang");
-                String ll_title = new String(set.getBytes("ll_title"), "UTF-8");
+                String ll_title = null;
+                if (set.getBytes("ll_title")!=null) {
+                    ll_title = new String(set.getBytes("ll_title"), "UTF-8");
+                }
                 storage.addInterwiki(pageLang, page_title, ll_lang, ll_title);
             }
         } catch (SQLException e) {
@@ -408,14 +411,14 @@ public class QueryHelper {
     // @formatter:on
 
     // NOTE: it is better to use another findLangLinks implementation 
-    public static Map<String, String> findLangLinks(String lang, String page, String namespace) {
+    public static Map<String, String> findLangLinks(String lang, String page, int namespace) {
         page = PageUtils.toDBView(page);
-        page = PageUtils.removeNamespace(page);
+        page = PageUtils.removeNamespace(lang, page, namespace);
         Map<String, String> result = new HashMap<String, String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findLangLinksQuery_SinglePage);
             st.setString(1, page);
-            st.setString(2, namespace);
+            st.setInt(2, namespace);
             System.out.println("Querying " + lang + ": " + st.toString());
             ResultSet set = st.executeQuery();
             while (set.next()) {
@@ -440,7 +443,7 @@ public class QueryHelper {
     
     public static Set<String> findAllTemplatesThatHaveLinksToPage(String lang, String page, int pagesNamespace) {
         page = PageUtils.toDBView(page);
-        page = PageUtils.removeNamespace(page);
+        page = PageUtils.removeNamespace(lang, page, pagesNamespace);
         Set<String> result = new HashSet<String>();
         try {
             PreparedStatement st = ConnectionFactory.getConnection(lang).prepareStatement(findAllTemplatesThatLinksToPageQuery);

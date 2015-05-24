@@ -25,7 +25,7 @@ public abstract class AbstractTemplateInterwikiFinder implements ITemplateInterw
 
     public AbstractTemplateInterwikiFinder(String templateLang, String templateName, Set<String> searchLangs) {
         this.templateLang = templateLang;
-        this.templateName = PageUtils.removeNamespace(templateName);
+        this.templateName = PageUtils.removeTemplateNamespace(templateLang, templateName);
         this.searchLangs = searchLangs;
         this.interwikiStorage = new PageInterwikiStorage(Constants.NAMESPACE_TEMPLATE);
     }

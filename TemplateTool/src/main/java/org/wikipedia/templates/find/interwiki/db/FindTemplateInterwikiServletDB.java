@@ -11,6 +11,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.wikipedia.api.Constants;
 import org.wikipedia.api.PageUtils;
 import org.wikipedia.api.db.ConnectionFactory;
 
@@ -51,7 +52,7 @@ public class FindTemplateInterwikiServletDB extends HttpServlet {
         }
         String templateName = null;
         if (templateNameParam != null) {
-            templateName = PageUtils.removeNamespace(templateNameParam);
+            templateName = PageUtils.removeNamespace(templateLang, templateNameParam, Constants.NAMESPACE_TEMPLATE);
             templateName = PageUtils.toNormalView(templateName);
         }
         boolean freeze = Boolean.valueOf(freezeParam);

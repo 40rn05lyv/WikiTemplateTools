@@ -38,12 +38,12 @@
                     <td><c:out value="${item.existing}"/></td>
                     <td><c:out value="${item.nonExisting}"/></td>
                     <td><fmt:formatNumber type="number" pattern="#.00" value="${item.percentage}" />%</td>
-                    <td><a href="/WikiNavbar/MyServlet2/?langFrom=en&langTo=uk&titleFrom=${item.article}">Translate</a></td>
+                    <td><a href="/TemplateTool/MyServlet2/?langFrom=en&langTo=uk&titleFrom=${item.article}">Translate</a></td>
                 </tr>
             </c:forEach>
         </tbody>
 	</table>
 	
-	<a href="/WikiNavbar/MyServlet/?continue=${continueParam}" class="btn btn-primary btn-lg active pull-right" role="button">Continue</a>
+	<a href="/TemplateTool/MyServlet/?continue=${continueParam}" class="btn btn-primary btn-lg active pull-right" role="button">Continue</a>
 </body>
 </html>

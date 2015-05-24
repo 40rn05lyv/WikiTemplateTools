@@ -15,7 +15,7 @@ public class ConnectionFactory {
     private static Session session;
     private static String dbUser = "u12033";
     private static String dbPasswd = "eenuoshohtoughuk";
-    private static int LPORT_START = 4711;
+    private static int LPORT_START = 4712;
 
     private static Map<String, Connection> connectionMap = new HashMap<String, Connection>();
 

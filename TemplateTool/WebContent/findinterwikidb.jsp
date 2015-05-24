@@ -29,7 +29,7 @@
       </h2>
     </div>
 
-    <form id="searchForm" class="form-horizontal" method="get" action="/WikiNavbar/FindTemplateInterwikiDB/">
+    <form id="searchForm" class="form-horizontal" method="get" action="/TemplateTool/FindTemplateInterwikiDB/">
       <div class="form-group">
         <label for="templateLang" class="col-sm-3 control-label">Language: </label>
         <div class="col-sm-1">

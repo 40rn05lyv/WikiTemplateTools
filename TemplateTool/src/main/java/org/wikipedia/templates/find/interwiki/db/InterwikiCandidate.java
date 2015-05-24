@@ -39,7 +39,7 @@ public class InterwikiCandidate {
         if (page == null) {
             return null;
         }
-        page = PageUtils.removeNamespace(page);
+        page = PageUtils.removeNamespace(lang, page, this.page.getNamespace());
         page = PageUtils.toNormalView(page);
         return page;
     }

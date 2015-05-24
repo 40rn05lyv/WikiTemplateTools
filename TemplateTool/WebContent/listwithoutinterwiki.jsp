@@ -24,7 +24,7 @@
 			</h2>
 		</div>
 
-		<form id="searchForm" class="form-horizontal" method="get" action="/WikiNavbar/ListTemplatesWithoutInterwiki/">
+		<form id="searchForm" class="form-horizontal" method="get" action="/TemplateTool/ListTemplatesWithoutInterwiki/">
 			<div class="form-group">
 				<label for="lang" class="col-sm-2 control-label">Language code:</label>
 				<div class="col-sm-1">
@@ -73,7 +73,7 @@
 							<td><c:out value="${status.index + 1}" /></td>
 							<td><a target="_blank" href="http://${searchLang}.wikipedia.org/wiki/Template:<c:out value="${item}"/>" /> <c:out value="${item}" /> </a></td>
 							<td><a target="_blank"
-								href="/WikiNavbar/FindTemplateInterwikiDB/?templateName=Template:<c:out value="${item}"/>&templateLang=${searchLang}&searchLangs=en,ru,pl,be,be-x-old&freeze=true">
+								href="/TemplateTool/FindTemplateInterwikiDB/?templateName=Template:<c:out value="${item}"/>&templateLang=${searchLang}&searchLangs=en,ru,pl,be,be-x-old&freeze=true">
 									Find Interwiki </a></td>
 						</tr>
 					</c:forEach>
